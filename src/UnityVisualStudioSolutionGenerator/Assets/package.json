@@ -1,0 +1,15 @@
+{
+    "name": "com.github-joc0de.visual-studio-solution-generator",
+    "displayName": "Unity Visual Studio Solution Generator",
+    "version": "1.0.0",
+    "description": "Visual Studio Solution Generator with improved developer productivity especially when working with multi-package unity projects",
+    "unity": "2021.2",
+    "keywords": [
+        "editor-extension",
+        "visual-studio"
+    ],
+    "license": "MIT",
+    "licensesUrl": "https://github.com/JoC0de/UnityVisualStudioSolutionGenerator/blob/main/LICENSE",
+    "changelogUrl": "https://github.com/JoC0de/UnityVisualStudioSolutionGenerator/releases",
+    "documentationUrl": "https://github.com/JoC0de/UnityVisualStudioSolutionGenerator/"
+}
