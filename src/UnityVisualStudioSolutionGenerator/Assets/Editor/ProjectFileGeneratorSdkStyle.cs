@@ -24,23 +24,14 @@ namespace UnityVisualStudioSolutionGenerator
             wrappedWriter.WriteElementString("IsUnityProject", "true");
             wrappedWriter.WriteEndElement(); // </PropertyGroup>
 
-            // we need to import the 'Framework' after setting 'BaseIntermediateOutputPath' see https://github.com/dotnet/msbuild/issues/1603
-            wrappedWriter.WriteStartElement("Import");
-            wrappedWriter.WriteAttributeString("Project", "Sdk.props");
-            wrappedWriter.WriteAttributeString("Sdk", "Microsoft.NET.Sdk");
-            wrappedWriter.WriteEndElement(); // </Import>
-
             var relativeSubProjectDirectories = FindSubProjectFolders(outputFileDirectoryPath);
             wrappedWriter.WriteStartElement("PropertyGroup");
             var fileExcludedPatterns = string.Join(
                 ';',
-                GeneratorSettings.SdkExcludedFilePatterns.Where(pattern => !string.IsNullOrWhiteSpace(pattern)).Select(pattern => pattern.Trim()));
-            var additionalExcludedPatterns = string.Join(
-                ';',
-                relativeSubProjectDirectories.Select(relativeSubProjectDirectory => $"{relativeSubProjectDirectory}/**"));
-            wrappedWriter.WriteElementString(
-                "DefaultItemExcludes",
-                $"$(DefaultItemExcludes);{fileExcludedPatterns}{(string.IsNullOrEmpty(additionalExcludedPatterns) ? string.Empty : ";")}{additionalExcludedPatterns}");
+                GeneratorSettings.SdkExcludedFilePatterns.Where(pattern => !string.IsNullOrWhiteSpace(pattern))
+                    .Select(pattern => pattern.Trim())
+                    .Concat(relativeSubProjectDirectories.Select(relativeSubProjectDirectory => $"{relativeSubProjectDirectory}/**")));
+            wrappedWriter.WriteElementString("DefaultItemExcludes", $"$(DefaultItemExcludes);{fileExcludedPatterns}");
             wrappedWriter.WriteElementString("ImplicitUsings", "disable");
 
             // unity explicitly imports all 'framework' DLLs so we need to disable importing them
@@ -70,8 +61,10 @@ namespace UnityVisualStudioSolutionGenerator
                 propertyGroup.WriteTo(wrappedWriter);
             }
 
+            // we need to import the 'Framework' explicitly after setting 'BaseIntermediateOutputPath' see https://github.com/dotnet/msbuild/issues/1603
+            // and https://learn.microsoft.com/en-us/visualstudio/msbuild/how-to-use-project-sdk#use-the-import-element-anywhere-in-your-project
             wrappedWriter.WriteStartElement("Import");
-            wrappedWriter.WriteAttributeString("Project", "Sdk.targets");
+            wrappedWriter.WriteAttributeString("Project", "Sdk.props");
             wrappedWriter.WriteAttributeString("Sdk", "Microsoft.NET.Sdk");
             wrappedWriter.WriteEndElement(); // </Import>
 
@@ -122,6 +115,12 @@ namespace UnityVisualStudioSolutionGenerator
             }
 
             wrappedWriter.WriteEndElement(); // </ItemGroup>
+
+            // targets are should be the last item
+            wrappedWriter.WriteStartElement("Import");
+            wrappedWriter.WriteAttributeString("Project", "Sdk.targets");
+            wrappedWriter.WriteAttributeString("Sdk", "Microsoft.NET.Sdk");
+            wrappedWriter.WriteEndElement(); // </Import>
 
             wrappedWriter.WriteEndElement(); // </Project>
             wrappedWriter.Flush();
