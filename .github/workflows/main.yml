@@ -2,7 +2,7 @@ name: Build and Test
 
 on:
   push:
-    branches: ["main", "feature/*"]
+    branches: ["main"]
     tags: ["v*"]
   pull_request_target:
     branches: ["main"]
