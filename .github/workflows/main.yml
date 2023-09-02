@@ -1,0 +1,38 @@
+name: Build and Test
+
+on:
+  push:
+    branches: ["main", "feature/*"]
+    tags: ["v*"]
+  pull_request_target:
+    branches: ["main"]
+
+permissions:
+  actions: read
+  checks: write
+  contents: read
+  statuses: write
+
+jobs:
+  testOnLinux:
+    name: Test on Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout action file
+        uses: Bhacaz/checkout-files@v2
+        with:
+          files: .github/actions/checkout/action.yml
+
+      - name: Checkout
+        uses: ./.github/actions/checkout
+
+      - name: Unity - Run tests
+        uses: game-ci/unity-test-runner@v2.1.1
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: src/UnityVisualStudioSolutionGenerator.Tests
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          testMode: EditMode
