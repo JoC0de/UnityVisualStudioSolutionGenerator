@@ -10,8 +10,17 @@ using System.Text;
 
 namespace UnityVisualStudioSolutionGenerator
 {
+    /// <summary>
+    ///     Writes a Visual Studio solution file.
+    /// </summary>
     public static class SolutionFileWriter
     {
+        /// <summary>
+        ///     Generates a Visual Studio solution file and write it to a string.
+        /// </summary>
+        /// <param name="solutionDirectoryPath">The absolute path of the solution directory.</param>
+        /// <param name="allProjects">All projects that should be included inside the solution.</param>
+        /// <returns>The content of the generated solution as plain text.</returns>
         public static string WriteToText(string solutionDirectoryPath, IReadOnlyList<ProjectFile> allProjects)
         {
             _ = allProjects ?? throw new ArgumentNullException(nameof(allProjects));
@@ -20,6 +29,13 @@ namespace UnityVisualStudioSolutionGenerator
             return writer.ToString();
         }
 
+        /// <summary>
+        ///     Generates a Visual Studio solution file and write it to a file. The file is overwritten so, we first write it to a temp file so any exceptions
+        ///     while generating the file don't lead to a incomplete file.
+        /// </summary>
+        /// <param name="outputFilePath">The file path to write the generated solution file.</param>
+        /// <param name="solutionDirectoryPath">The absolute path of the solution directory.</param>
+        /// <param name="projectFiles">All projects that should be included inside the solution.</param>
         [SuppressMessage("Security", "CA5351", Justification = "Hash is only used for comparison.")]
         public static void WriteToFileSafe(string outputFilePath, string solutionDirectoryPath, IReadOnlyList<ProjectFile> projectFiles)
         {

@@ -3,7 +3,8 @@
     "rootNamespace": "UnityVisualStudioSolutionGenerator.Tests",
     "references": [
         "UnityEditor.TestRunner",
-        "UnityVisualStudioSolutionGenerator"
+        "UnityVisualStudioSolutionGenerator",
+        "Unity.VisualStudio.Editor"
     ],
     "includePlatforms": [
         "Editor"

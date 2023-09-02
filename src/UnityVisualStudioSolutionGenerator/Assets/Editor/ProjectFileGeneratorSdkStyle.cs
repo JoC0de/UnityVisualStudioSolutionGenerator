@@ -1,3 +1,5 @@
+#nullable enable
+
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -5,13 +7,18 @@ using System.Xml.Linq;
 
 namespace UnityVisualStudioSolutionGenerator
 {
+    /// <summary>
+    ///     Generates a C# project file in the new sdk style (the new style is currently not directly supported by the Unity Visual Studio Plugin).
+    /// </summary>
     public class ProjectFileGeneratorSdkStyle : ProjectFileGeneratorBase
     {
+        /// <inheritdoc cref="ProjectFileGeneratorBase(System.Xml.Linq.XDocument,string)" />
         public ProjectFileGeneratorSdkStyle(XDocument document, string filePath)
             : base(document, filePath)
         {
         }
 
+        /// <inheritdoc />
         protected override void WriteProjectFileInternal(XmlWriter writer, string outputFileDirectoryPath)
         {
             using var wrappedWriter = new XmlWriterWithoutNamespace(writer);
@@ -255,8 +262,13 @@ namespace UnityVisualStudioSolutionGenerator
 
             protected override void Dispose(bool disposing)
             {
+                base.Dispose(disposing);
                 implementation.Dispose();
             }
         }
+
+        // ReSharper disable CommentTypo
+        // Ignore Spelling: pubid, sysid
+        // ReSharper restore CommentTypo
     }
 }

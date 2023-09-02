@@ -6,7 +6,7 @@ import time
 scriptLocation = os.path.dirname(os.path.realpath(sys.argv[0]))
 repositoryRoot = os.path.dirname(scriptLocation)
 
-solutionFiles = ["src/UnityVisualStudioSolutionGenerator/UnityVisualStudioSolutionGenerator.sln"]
+solutionFiles = ["src/UnityVisualStudioSolutionGenerator.Tests/UnityVisualStudioSolutionGenerator.Tests.sln"]
 toolsRoot = repositoryRoot
 
 subprocess.run(["dotnet", "tool", "restore"], cwd = toolsRoot, check = True)
