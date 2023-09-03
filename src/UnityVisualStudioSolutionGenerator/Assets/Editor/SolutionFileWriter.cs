@@ -20,13 +20,11 @@ namespace UnityVisualStudioSolutionGenerator
         /// </summary>
         /// <param name="solutionDirectoryPath">The absolute path of the solution directory.</param>
         /// <param name="allProjects">All projects that should be included inside the solution.</param>
-        /// <param name="newLineChars">The new-line char used. Defaults to the system specific new-line char.</param>
         /// <returns>The content of the generated solution as plain text.</returns>
-        public static string WriteToText(string solutionDirectoryPath, IReadOnlyList<ProjectFile> allProjects, string? newLineChars = null)
+        public static string WriteToText(string solutionDirectoryPath, IReadOnlyList<ProjectFile> allProjects)
         {
             _ = allProjects ?? throw new ArgumentNullException(nameof(allProjects));
             using var writer = new StringWriter();
-            writer.NewLine = newLineChars ?? Environment.NewLine;
             GenerateVisualStudioSolution(writer, solutionDirectoryPath, allProjects);
             return writer.ToString();
         }

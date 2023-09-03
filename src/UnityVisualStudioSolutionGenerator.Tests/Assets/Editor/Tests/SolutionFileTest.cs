@@ -69,7 +69,7 @@ EndGlobal
         [Test]
         public void WriteSolutionTest()
         {
-            var generatedSolutionContent = SolutionFileWriter.WriteToText(SolutionDirectoryPath, TestSolutionProjectFiles, "\r\n");
+            var generatedSolutionContent = SolutionFileWriter.WriteToText(SolutionDirectoryPath, TestSolutionProjectFiles);
 
             Assert.That(generatedSolutionContent, Is.EqualTo(TestSolutionContent));
         }
