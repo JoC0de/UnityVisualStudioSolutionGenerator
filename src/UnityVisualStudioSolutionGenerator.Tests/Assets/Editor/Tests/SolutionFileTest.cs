@@ -7,13 +7,13 @@ namespace UnityVisualStudioSolutionGenerator.Tests
 {
     public class SolutionFileTest
     {
-        private const string TestSolutionContent = @"Microsoft Visual Studio Solution File, Format Version 12.00
+        private static readonly string TestSolutionContent = @"Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project(""{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"") = ""UnityVisualStudioSolutionGenerator"", ""..\UnityVisualStudioSolutionGenerator\Assets\Editor\UnityVisualStudioSolutionGenerator.csproj"", ""{91E92C9C-24FB-0F81-A436-50F1D483A5F4}""
+Project(""{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"") = ""UnityVisualStudioSolutionGenerator"", ""../UnityVisualStudioSolutionGenerator/Assets/Editor/UnityVisualStudioSolutionGenerator.csproj"", ""{91E92C9C-24FB-0F81-A436-50F1D483A5F4}""
 EndProject
-Project(""{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"") = ""UnityVisualStudioSolutionGenerator.Tests"", ""Assets\Editor\Tests\UnityVisualStudioSolutionGenerator.Tests.csproj"", ""{50330BEB-948C-A36A-8379-F379D799AF9A}""
+Project(""{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"") = ""UnityVisualStudioSolutionGenerator.Tests"", ""Assets/Editor/Tests/UnityVisualStudioSolutionGenerator.Tests.csproj"", ""{50330BEB-948C-A36A-8379-F379D799AF9A}""
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,7 +34,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
-";
+".Replace('/', Path.DirectorySeparatorChar);
 
         private static readonly ProjectFile[] TestSolutionProjectFiles;
 
@@ -49,11 +49,10 @@ EndGlobal
                     Path.GetFullPath(
                         Path.Combine(
                             SolutionDirectoryPath,
-                            "..\\UnityVisualStudioSolutionGenerator\\Assets\\Editor\\UnityVisualStudioSolutionGenerator.csproj")),
+                            "../UnityVisualStudioSolutionGenerator/Assets/Editor/UnityVisualStudioSolutionGenerator.csproj")),
                     "{91E92C9C-24FB-0F81-A436-50F1D483A5F4}"),
                 new ProjectFile(
-                    Path.GetFullPath(
-                        Path.Combine(SolutionDirectoryPath, "Assets\\Editor\\Tests\\UnityVisualStudioSolutionGenerator.Tests.csproj")),
+                    Path.GetFullPath(Path.Combine(SolutionDirectoryPath, "Assets/Editor/Tests/UnityVisualStudioSolutionGenerator.Tests.csproj")),
                     "{50330BEB-948C-A36A-8379-F379D799AF9A}"),
             };
         }
