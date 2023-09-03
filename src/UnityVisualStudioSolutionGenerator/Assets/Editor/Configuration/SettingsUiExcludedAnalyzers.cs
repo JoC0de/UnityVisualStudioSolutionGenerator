@@ -8,6 +8,9 @@ using UnityEngine;
 
 namespace UnityVisualStudioSolutionGenerator
 {
+    /// <summary>
+    ///     The part of the settings UI that handles the section for: <see cref="GeneratorSettings.ExcludedAnalyzers" />.
+    /// </summary>
     [SuppressMessage("ReSharper", "UnusedType.Global", Justification = "Used by 'UserSettingsProvider'")]
     public static class SettingsUiExcludedAnalyzers
     {
@@ -16,16 +19,18 @@ namespace UnityVisualStudioSolutionGenerator
         [UserSettingBlock("General Settings")]
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Called by 'UserSettingsProvider'")]
         [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = "Called by 'UserSettingsProvider'")]
+        [SuppressMessage("ReSharper", "UnusedParameter.Local", Justification = "Called by 'UserSettingsProvider'")]
+        [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Called by 'UserSettingsProvider'")]
         private static void ExcludedAnalyzersGui(string searchContext)
         {
-            editor ??= new ReorderableList(GeneratorSettings.ExcludedAnalyzers, typeof(string), false, true, true, true)
+            editor ??= new ReorderableList(GeneratorSettings.ExcludedAnalyzersSetting.value, typeof(string), true, true, true, true)
             {
                 drawHeaderCallback = DrawHeader, drawElementCallback = DrawItems,
             };
 
             SettingsUiListHelper.DrawEditableSettingsList(
                 editor,
-                "Analyzers to exclude from Project (e.g. because they are not loading)",
+                "Analyzers to exclude from Project (e.g. because Visual Studio fails to load them)",
                 GeneratorSettings.ExcludedAnalyzersSetting);
             EditorGUI.BeginChangeCheck();
         }

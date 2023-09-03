@@ -1,41 +1,91 @@
 #nullable enable
 using Microsoft.Unity.VisualStudio.Editor;
+using Unity.CodeEditor;
 using UnityEditor;
 
 namespace UnityVisualStudioSolutionGenerator
 {
+    /// <summary>
+    ///     Provides menu items to access quick actions for Unity Visual Studio solutions.
+    /// </summary>
     public static class MenuItemProvider
     {
+        /// <summary>
+        ///     Opens the C# project in Visual Studio.
+        /// </summary>
         [MenuItem("Visual Studio/Open Solution", priority = 0)]
         public static void OpenSolution()
         {
             EditorApplication.ExecuteMenuItem("Assets/Open C# Project");
         }
 
+        /// <summary>
+        ///     Returns whether or not the <see cref="OpenSolution" /> menu item should be enabled.
+        /// </summary>
+        /// <returns>True if the menu item should be enabled, False otherwise.</returns>
+        [MenuItem("Visual Studio/Open Solution", true)]
+        public static bool OpenSolutionEnabled()
+        {
+            return IsVisualStudioEditorEnabled();
+        }
+
+        /// <summary>
+        ///     Regenerates the Visual Studio solution file and the C# project files as SDK-style projects.
+        /// </summary>
         [MenuItem("Visual Studio/Generate Solution (Sdk-Style)", priority = 1)]
         public static void SyncSolutionSdkStyle()
         {
             GeneratorSettings.GenerateSdkStyleProjects = true;
-            new VisualStudioEditor().SyncAll();
+            CodeEditor.CurrentEditor.SyncAll();
         }
 
+        /// <summary>
+        ///     Returns whether or not the <see cref="SyncSolutionSdkStyle" /> menu item should be enabled.
+        /// </summary>
+        /// <returns>True if the menu item should be enabled, False otherwise.</returns>
+        [MenuItem("Visual Studio/Generate Solution (Sdk-Style)", true)]
+        public static bool SyncSolutionSdkStyleEnabled()
+        {
+            return IsSolutionGeneratorEnabled();
+        }
+
+        /// <summary>
+        ///     Regenerates the Visual Studio solution file and the C# project files as Legacy-style projects.
+        /// </summary>
         [MenuItem("Visual Studio/Generate Solution (Legacy-Style)", priority = 2)]
-        public static void SyncSolution()
+        public static void SyncSolutionLegacyStyle()
         {
             GeneratorSettings.GenerateSdkStyleProjects = false;
-            new VisualStudioEditor().SyncAll();
+            CodeEditor.CurrentEditor.SyncAll();
         }
 
-        [MenuItem("Visual Studio/Enable Verbose Logging", priority = 3)]
-        public static void EnableVerboseLogging()
+        /// <summary>
+        ///     Returns whether or not the <see cref="SyncSolutionLegacyStyle" /> menu item should be enabled.
+        /// </summary>
+        /// <returns>True if the menu item should be enabled, False otherwise.</returns>
+        [MenuItem("Visual Studio/Generate Solution (Legacy-Style)", true)]
+        public static bool SyncSolutionLegacyStyleEnabled()
         {
-            GeneratorSettings.LogVerbose = true;
+            return IsSolutionGeneratorEnabled();
         }
 
-        [MenuItem("Visual Studio/Preferences", priority = 4)]
+        /// <summary>
+        ///     Opens the solution generation preferences page.
+        /// </summary>
+        [MenuItem("Visual Studio/Preferences", priority = 3)]
         public static void OpenPreferences()
         {
             SettingsService.OpenUserPreferences(GeneratorSettingsProvider.PreferencesPath);
+        }
+
+        private static bool IsSolutionGeneratorEnabled()
+        {
+            return GeneratorSettings.IsEnabled && IsVisualStudioEditorEnabled();
+        }
+
+        private static bool IsVisualStudioEditorEnabled()
+        {
+            return CodeEditor.CurrentEditor is VisualStudioEditor;
         }
     }
 }

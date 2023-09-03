@@ -8,6 +8,9 @@ using UnityEngine;
 
 namespace UnityVisualStudioSolutionGenerator
 {
+    /// <summary>
+    ///     The part of the settings UI that handles the section for: <see cref="GeneratorSettings.SdkAdditionalProperties" />.
+    /// </summary>
     [SuppressMessage("ReSharper", "UnusedType.Global", Justification = "Used by 'UserSettingsProvider'")]
     public static class SettingsUiSdkAdditionalProperties
     {
@@ -18,12 +21,17 @@ namespace UnityVisualStudioSolutionGenerator
         [UserSettingBlock("Sdk-style Project Settings")]
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Called by 'UserSettingsProvider'")]
         [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = "Called by 'UserSettingsProvider'")]
+        [SuppressMessage("ReSharper", "UnusedParameter.Local", Justification = "Called by 'UserSettingsProvider'")]
+        [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Called by 'UserSettingsProvider'")]
         private static void SdkAdditionalPropertiesGui(string searchContext)
         {
-            editor ??= new ReorderableList(GeneratorSettings.SdkAdditionalProperties, typeof(PropertyGroupSetting), false, true, true, true)
-            {
-                drawHeaderCallback = DrawHeader, drawElementCallback = DrawSdkAdditionalPropertiesItems,
-            };
+            editor ??= new ReorderableList(
+                GeneratorSettings.SdkAdditionalPropertiesSetting.value,
+                typeof(PropertyGroupSetting),
+                true,
+                true,
+                true,
+                true) { drawHeaderCallback = DrawHeader, drawElementCallback = DrawSdkAdditionalPropertiesItems };
 
             GUILayout.Label("Additional Project Properties (PropertyGroup)");
             EditorGUILayout.HelpBox(

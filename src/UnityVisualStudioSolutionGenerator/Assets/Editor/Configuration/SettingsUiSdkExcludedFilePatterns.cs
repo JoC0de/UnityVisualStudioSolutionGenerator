@@ -8,6 +8,9 @@ using UnityEngine;
 
 namespace UnityVisualStudioSolutionGenerator
 {
+    /// <summary>
+    ///     The part of the settings UI that handles the section for: <see cref="GeneratorSettings.SdkExcludedFilePatterns" />.
+    /// </summary>
     [SuppressMessage("ReSharper", "UnusedType.Global", Justification = "Used by 'UserSettingsProvider'")]
     public static class SettingsUiSdkExcludedFilePatterns
     {
@@ -16,9 +19,11 @@ namespace UnityVisualStudioSolutionGenerator
         [UserSettingBlock("Sdk-style Project Settings")]
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Called by 'UserSettingsProvider'")]
         [SuppressMessage("ReSharper", "UnusedMember.Local", Justification = "Called by 'UserSettingsProvider'")]
+        [SuppressMessage("ReSharper", "UnusedParameter.Local", Justification = "Called by 'UserSettingsProvider'")]
+        [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Called by 'UserSettingsProvider'")]
         private static void SdkExcludedFilePatternsGui(string searchContext)
         {
-            editor ??= new ReorderableList(GeneratorSettings.SdkExcludedFilePatternsSetting.value, typeof(string), false, false, true, true)
+            editor ??= new ReorderableList(GeneratorSettings.SdkExcludedFilePatternsSetting.value, typeof(string), true, false, true, true)
             {
                 drawElementCallback = DrawSdkExcludedFilePatternsItems,
             };

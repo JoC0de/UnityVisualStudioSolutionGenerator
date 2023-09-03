@@ -9,8 +9,17 @@ using UnityEngine;
 
 namespace UnityVisualStudioSolutionGenerator
 {
-    public static class SettingsUiListHelper
+    /// <summary>
+    ///     Helper for drawing <see cref="ReorderableList" />s in the settings UI.
+    /// </summary>
+    internal static class SettingsUiListHelper
     {
+        /// <summary>
+        ///     Draws a <see cref="ReorderableList" /> in the settings UI.
+        /// </summary>
+        /// <param name="editor">The 'list' to draw.</param>
+        /// <param name="headerText">An additional header text to show, if omitted no header will by rendered.</param>
+        /// <param name="setting">The settings value that is edited by this UI, used to apply / persist changes done by the UI.</param>
         public static void DrawEditableSettingsList(ReorderableList editor, string? headerText, IUserSetting setting)
         {
             _ = editor ?? throw new ArgumentNullException(nameof(editor));

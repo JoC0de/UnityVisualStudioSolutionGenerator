@@ -6,13 +6,18 @@ using System.Xml.Linq;
 
 namespace UnityVisualStudioSolutionGenerator
 {
+    /// <summary>
+    ///     Generates a C# project file in the legacy style (the style currently used by the Unity Visual Studio Plugin).
+    /// </summary>
     public class ProjectFileGeneratorLegacyStyle : ProjectFileGeneratorBase
     {
+        /// <inheritdoc cref="ProjectFileGeneratorBase(System.Xml.Linq.XDocument,string)" />
         public ProjectFileGeneratorLegacyStyle(XDocument document, string filePath)
             : base(document, filePath)
         {
         }
 
+        /// <inheritdoc />
         protected override void WriteProjectFileInternal(XmlWriter writer, string outputFileDirectoryPath)
         {
             _ = writer ?? throw new ArgumentNullException(nameof(writer));
