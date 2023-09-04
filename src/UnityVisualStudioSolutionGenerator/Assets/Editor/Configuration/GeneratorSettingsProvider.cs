@@ -12,7 +12,7 @@ namespace UnityVisualStudioSolutionGenerator
         /// <summary>
         ///     The path to the settings of this package in the Unity preferences window.
         /// </summary>
-        internal const string PreferencesPath = "Preferences/Visual Studio Solution Generator";
+        internal const string PreferencesPath = "Project/Visual Studio Solution Generator";
 
         /// <summary>
         ///     Creates the settings provider for this package.
@@ -23,7 +23,11 @@ namespace UnityVisualStudioSolutionGenerator
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Called by Unity")]
         private static SettingsProvider CreateSettingsProvider()
         {
-            return new UserSettingsProvider(PreferencesPath, GeneratorSettingsManager.Instance, new[] { typeof(GeneratorSettingsProvider).Assembly });
+            return new UserSettingsProvider(
+                PreferencesPath,
+                GeneratorSettingsManager.Instance,
+                new[] { typeof(GeneratorSettingsProvider).Assembly },
+                SettingsScope.Project);
         }
     }
 }
