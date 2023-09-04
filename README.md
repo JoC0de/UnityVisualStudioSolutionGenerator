@@ -28,7 +28,7 @@ Advantages of using SDK-style projects:
 
 Disadvantages of using SDK-style projects:
 
--   The Visual Studio Unity Plugin doesn't detect the projects as Unity Projects this leads to some changes in the behavior of Visual Studio so e.g. to start debugging instead of `Attach to Unity` you need to use `Debug -> Attach Unity Debugger`
+-   The Visual Studio Unity Plugin doesn't detect the projects as Unity Projects this leads to some changes in the behavior of Visual Studio so e.g. to start debugging instead of `Attach to Unity` you need to use `Debug -> Attach Unity Debugger`<br />
     ![Attach to Unity menu item](docs/img/attach-to-unity.png) ![Debug -> Attach Unity Debugger menu item](docs/img/attach-unity-debuger.png).
 
 ## Settings
