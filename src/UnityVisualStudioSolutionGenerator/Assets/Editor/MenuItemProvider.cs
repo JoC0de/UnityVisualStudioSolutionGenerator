@@ -75,7 +75,7 @@ namespace UnityVisualStudioSolutionGenerator
         [MenuItem("Visual Studio/Preferences", priority = 3)]
         public static void OpenPreferences()
         {
-            SettingsService.OpenUserPreferences(GeneratorSettingsProvider.PreferencesPath);
+            SettingsService.OpenProjectSettings(GeneratorSettingsProvider.PreferencesPath);
         }
 
         private static bool IsSolutionGeneratorEnabled()
