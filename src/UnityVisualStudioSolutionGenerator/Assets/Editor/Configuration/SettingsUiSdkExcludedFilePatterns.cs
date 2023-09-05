@@ -28,7 +28,10 @@ namespace UnityVisualStudioSolutionGenerator
                 drawElementCallback = DrawSdkExcludedFilePatternsItems,
             };
 
-            SettingsUiListHelper.DrawEditableSettingsList(editor, "Excluded files patterns", GeneratorSettings.SdkExcludedFilePatternsSetting);
+            SettingsUiListHelper.DrawEditableSettingsList(
+                editor,
+                "File patterns to excluded from project file",
+                GeneratorSettings.SdkExcludedFilePatternsSetting);
         }
 
         private static void DrawSdkExcludedFilePatternsItems(Rect rect, int index, bool isActive, bool isFocused)

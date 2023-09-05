@@ -10,6 +10,17 @@ namespace UnityVisualStudioSolutionGenerator
     public class PropertyGroupSetting
     {
         /// <summary>
+        ///     Initializes a new instance of the <see cref="PropertyGroupSetting" /> class.
+        /// </summary>
+        /// <param name="name">The name of the property.</param>
+        /// <param name="value">The property value.</param>
+        public PropertyGroupSetting(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
+
+        /// <summary>
         ///     Gets or sets the name of the property.
         /// </summary>
         [field: SerializeField]
@@ -20,16 +31,5 @@ namespace UnityVisualStudioSolutionGenerator
         /// </summary>
         [field: SerializeField]
         public string Value { get; set; }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="PropertyGroupSetting" /> class.
-        /// </summary>
-        /// <param name="name">The name of the property.</param>
-        /// <param name="value">The property value.</param>
-        public PropertyGroupSetting(string name, string value)
-        {
-            Name = name;
-            Value = value;
-        }
     }
 }
