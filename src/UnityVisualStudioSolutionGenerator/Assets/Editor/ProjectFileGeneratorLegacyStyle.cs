@@ -11,7 +11,7 @@ namespace UnityVisualStudioSolutionGenerator
     /// </summary>
     public class ProjectFileGeneratorLegacyStyle : ProjectFileGeneratorBase
     {
-        /// <inheritdoc cref="ProjectFileGeneratorBase(System.Xml.Linq.XDocument,string)" />
+        /// <inheritdoc cref="ProjectFileGeneratorBase(XDocument,string)" />
         public ProjectFileGeneratorLegacyStyle(XDocument document, string filePath)
             : base(document, filePath)
         {

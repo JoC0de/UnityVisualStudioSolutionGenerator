@@ -45,7 +45,7 @@ namespace UnityVisualStudioSolutionGenerator
         /// <summary>
         ///     Gets the absolute path of the solution directory.
         /// </summary>
-        public string SolutionDirectoryPath { get; }
+        protected string SolutionDirectoryPath { get; }
 
         /// <summary>
         ///     Gets the name of the project, the name of the project file.
@@ -77,31 +77,35 @@ namespace UnityVisualStudioSolutionGenerator
         private string ProjectOutputFilePath => Path.ChangeExtension(AssemblyDefinitionFilePath, ".csproj");
 
         /// <summary>
-        ///     Determines the path of the new project file based on the assembly definition file included in the project.
-        /// </summary>
-        /// <param name="projectFilePath">The absolute path of the project file.</param>
-        /// <returns>The new project file path.</returns>
-        public static string DetermineNewProjectFilePath(string projectFilePath)
-        {
-            var projectXml = new ProjectFileGeneratorSdkStyle(XDocument.Load(projectFilePath), projectFilePath);
-            return projectXml.IsProjectFromPackage() ? projectFilePath : projectXml.ProjectOutputFilePath;
-        }
-
-        /// <summary>
         ///     Determines whether the project is from the package cache.
         /// </summary>
         /// <returns>True if the project file is from a package, False otherwise.</returns>
-        public bool IsProjectFromPackage()
+        public bool IsProjectFromPackageCache()
         {
-            return AssemblyDefinitionFilePath.Contains(
-                $"{Path.DirectorySeparatorChar}Library{Path.DirectorySeparatorChar}PackageCache{Path.DirectorySeparatorChar}",
-                StringComparison.OrdinalIgnoreCase);
+            if (assemblyDefinitionFilePath is not null)
+            {
+                return IsProjectFileFromPackageCache(assemblyDefinitionFilePath);
+            }
+
+            var anyProjectFilePath = ProjectElement.Descendants(XmlNamespace + "None")
+                .Concat(ProjectElement.Descendants(XmlNamespace + "Compile"))
+                .Select(element => element.Attribute("Include")?.Value)
+                .FirstOrDefault(itemPath => itemPath is not null);
+
+            if (anyProjectFilePath is not null)
+            {
+                return IsProjectFileFromPackageCache(Path.GetFullPath(anyProjectFilePath, SolutionDirectoryPath));
+            }
+
+            LogHelper.LogWarning($"The project file: {filePath} has no content so skipping it.");
+            return true;
         }
 
         /// <summary>
         ///     Writes the project file to disk inside <see cref="ProjectOutputFilePath" />.
         /// </summary>
-        public void WriteProjectFile()
+        /// <returns>The absolute path to witch the file was written.</returns>
+        public string WriteProjectFile()
         {
             var outputFilePath = ProjectOutputFilePath;
             var outputFileDirectoryPath = Path.GetDirectoryName(outputFilePath) ??
@@ -121,6 +125,19 @@ namespace UnityVisualStudioSolutionGenerator
                     IndentChars = "    ",
                 });
             WriteProjectFileInternal(innerWriter, outputFileDirectoryPath);
+
+            return outputFilePath;
+        }
+
+        /// <summary>
+        ///     Determines the path of the new project file based on the assembly definition file included in the project.
+        /// </summary>
+        /// <param name="projectFilePath">The absolute path of the project file.</param>
+        /// <returns>The new project file path.</returns>
+        protected static string DetermineNewProjectFilePath(string projectFilePath)
+        {
+            var projectXml = new ProjectFileGeneratorSdkStyle(XDocument.Load(projectFilePath), projectFilePath);
+            return projectXml.IsProjectFromPackageCache() ? projectFilePath : projectXml.ProjectOutputFilePath;
         }
 
         /// <summary>
@@ -147,6 +164,20 @@ namespace UnityVisualStudioSolutionGenerator
         /// <param name="writer">The XML writer.</param>
         /// <param name="outputFileDirectoryPath">The absolute path of the output folder.</param>
         protected abstract void WriteProjectFileInternal(XmlWriter writer, string outputFileDirectoryPath);
+
+        /// <summary>
+        ///     Determines whether the project is from the package cache.
+        /// </summary>
+        /// <param name="projectFilePath">The absolute path to the project file (can also be a file that lies inside the project folder).</param>
+        /// <returns>True if the project file is from a package that is located inside the 'PackageCache', False otherwise.</returns>
+        private static bool IsProjectFileFromPackageCache(string projectFilePath)
+        {
+            _ = projectFilePath ?? throw new ArgumentNullException(nameof(projectFilePath));
+
+            return projectFilePath.Contains(
+                $"{Path.DirectorySeparatorChar}Library{Path.DirectorySeparatorChar}PackageCache{Path.DirectorySeparatorChar}",
+                StringComparison.OrdinalIgnoreCase);
+        }
 
         private static bool MatchesOnePattern(string? value, List<string[]> patterns)
         {

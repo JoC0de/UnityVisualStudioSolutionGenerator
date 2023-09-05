@@ -29,6 +29,15 @@ namespace UnityVisualStudioSolutionGenerator
         }
 
         /// <summary>
+        ///     Logs a error message. Always shown in the log and has a extra highlight.
+        /// </summary>
+        /// <param name="message">The message to log.</param>
+        public static void LogWarning(FormattableString message)
+        {
+            Log(LogType.Warning, message);
+        }
+
+        /// <summary>
         ///     Logs a verbose message. A message that is only shown if <see cref="GeneratorSettings.LogVerbose" /> is enabled.
         /// </summary>
         /// <param name="message">The message to log.</param>

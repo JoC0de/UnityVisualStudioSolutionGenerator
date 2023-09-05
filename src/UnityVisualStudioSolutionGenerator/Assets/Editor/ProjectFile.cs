@@ -42,15 +42,15 @@ namespace UnityVisualStudioSolutionGenerator
             return Id.GetHashCode(StringComparison.Ordinal);
         }
 
-        private bool Equals(ProjectFile other)
-        {
-            return Id == other.Id;
-        }
-
         /// <inheritdoc />
         public override string ToString()
         {
             return $"{nameof(FilePath)}: {FilePath}, {nameof(Id)}: {Id}";
+        }
+
+        private bool Equals(ProjectFile other)
+        {
+            return Id == other.Id;
         }
     }
 }
