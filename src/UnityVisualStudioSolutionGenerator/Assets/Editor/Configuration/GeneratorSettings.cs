@@ -21,6 +21,11 @@ namespace UnityVisualStudioSolutionGenerator
         [UserSetting("General Settings", "Enable verbose logging")]
         private static readonly GeneratorSettingsValue<bool> LogVerboseSetting = new($"general.{nameof(LogVerbose)}", false);
 
+        [UserSetting("General Settings", "Enable nullable reference type checking", "Add '#nullable enable' at the top of each '.cs' file.")]
+        private static readonly GeneratorSettingsValue<bool> EnableNullableReferenceTypesSetting = new(
+            $"general.{nameof(EnableNullableReferenceTypes)}",
+            false);
+
         /// <summary>
         ///     Gets or sets a value indicating whether this generator is enabled.
         ///     If disabled Unity will use the 'normal' solution generator.
@@ -47,6 +52,16 @@ namespace UnityVisualStudioSolutionGenerator
         {
             get => LogVerboseSetting.value;
             set => LogVerboseSetting.value = value;
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether to add '#nullable enable' at the top of each '.cs' file.
+        ///     <see href="https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references" />.
+        /// </summary>
+        public static bool EnableNullableReferenceTypes
+        {
+            get => EnableNullableReferenceTypesSetting.value;
+            set => EnableNullableReferenceTypesSetting.value = value;
         }
 
         /// <summary>

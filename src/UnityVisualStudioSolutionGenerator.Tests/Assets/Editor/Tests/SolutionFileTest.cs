@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,26 +38,20 @@ Global
 EndGlobal
 ".Replace('/', Path.DirectorySeparatorChar);
 
-        private static readonly ProjectFile[] TestSolutionProjectFiles;
+        private static readonly string SolutionDirectoryPath = Path.GetFullPath(Directory.GetCurrentDirectory());
 
-        private static readonly string SolutionDirectoryPath;
-
-        static SolutionFileTest()
+        private static readonly ProjectFile[] TestSolutionProjectFiles =
         {
-            SolutionDirectoryPath = Path.GetFullPath(Directory.GetCurrentDirectory());
-            TestSolutionProjectFiles = new[]
-            {
-                new ProjectFile(
-                    Path.GetFullPath(
-                        Path.Combine(
-                            SolutionDirectoryPath,
-                            "../UnityVisualStudioSolutionGenerator/Assets/Editor/UnityVisualStudioSolutionGenerator.csproj")),
-                    "{91E92C9C-24FB-0F81-A436-50F1D483A5F4}"),
-                new ProjectFile(
-                    Path.GetFullPath(Path.Combine(SolutionDirectoryPath, "Assets/Editor/Tests/UnityVisualStudioSolutionGenerator.Tests.csproj")),
-                    "{50330BEB-948C-A36A-8379-F379D799AF9A}"),
-            };
-        }
+            new(
+                Path.GetFullPath(
+                    Path.Combine(
+                        SolutionDirectoryPath,
+                        "../UnityVisualStudioSolutionGenerator/Assets/Editor/UnityVisualStudioSolutionGenerator.csproj")),
+                "{91E92C9C-24FB-0F81-A436-50F1D483A5F4}"),
+            new(
+                Path.GetFullPath(Path.Combine(SolutionDirectoryPath, "Assets/Editor/Tests/UnityVisualStudioSolutionGenerator.Tests.csproj")),
+                "{50330BEB-948C-A36A-8379-F379D799AF9A}"),
+        };
 
         [Test]
         public void ParseSolutionTest()
@@ -75,7 +71,7 @@ EndGlobal
 
         private sealed class ProjectFileEqualityComparer : IEqualityComparer<ProjectFile>
         {
-            public bool Equals(ProjectFile x, ProjectFile y)
+            public bool Equals(ProjectFile? x, ProjectFile? y)
             {
                 if (ReferenceEquals(x, y))
                 {

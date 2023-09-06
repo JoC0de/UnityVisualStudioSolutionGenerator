@@ -5,9 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Xml.Linq;
 using UnityEditor;
-using UnityEngine;
 
 namespace UnityVisualStudioSolutionGenerator
 {
@@ -33,17 +31,15 @@ namespace UnityVisualStudioSolutionGenerator
             }
 
             var stopwatch = Stopwatch.StartNew();
-            var solutionDirectoryPath = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
-            var solutionFilePath = $"{Path.Combine(solutionDirectoryPath, Path.GetFileName(solutionDirectoryPath))}.sln";
-            var allProjects = SolutionFileParser.Parse(File.ReadAllText(solutionFilePath), solutionDirectoryPath, !GeneratorSettings.IsEnabled);
+            var solutionFile = SolutionFile.CurrentProjectSolution;
+            var allProjects = SolutionFileParser.Parse(solutionFile, false);
 
             var newProjects = new List<ProjectFile>();
             foreach (var project in allProjects)
             {
-                var document = XDocument.Load(project.FilePath);
                 ProjectFileGeneratorBase generator = GeneratorSettings.GenerateSdkStyleProjects
-                    ? new ProjectFileGeneratorSdkStyle(document, project.FilePath)
-                    : new ProjectFileGeneratorLegacyStyle(document, project.FilePath);
+                    ? new ProjectFileGeneratorSdkStyle(project.FilePath)
+                    : new ProjectFileGeneratorLegacyStyle(project.FilePath);
 
                 if (generator.IsProjectFromPackageCache())
                 {
@@ -53,14 +49,13 @@ namespace UnityVisualStudioSolutionGenerator
                     continue;
                 }
 
-                var newProjectFilePath = generator.WriteProjectFile();
+                var newProjectFilePath = generator.WriteProjectFile(solutionFile.SolutionDirectoryPath);
 
                 newProjects.Add(new ProjectFile(newProjectFilePath, project.Id));
             }
 
-            SolutionFileWriter.WriteToFileSafe(solutionFilePath, solutionDirectoryPath, newProjects);
-            LogHelper.LogInformation(
-                $"Generated Visual Studio Solution: '{Path.GetFileName(solutionFilePath)}' in {stopwatch.ElapsedMilliseconds} ms.");
+            SolutionFileWriter.WriteToFileSafe(solutionFile.SolutionFilePath, solutionFile.SolutionDirectoryPath, newProjects);
+            LogHelper.LogInformation($"Generated Visual Studio Solution: '{solutionFile}' in {stopwatch.ElapsedMilliseconds} ms.");
         }
 
         /// <summary>

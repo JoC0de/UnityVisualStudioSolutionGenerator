@@ -17,6 +17,11 @@
                 "value": "{\"m_Value\":false}"
             },
             {
+                "type": "System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+                "key": "general.EnableNullableReferenceTypes",
+                "value": "{\"m_Value\":true}"
+            },
+            {
                 "type": "System.Collections.Generic.List`1[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
                 "key": "legacy-style.ExcludedAnalyzers",
                 "value": "{\"m_Value\":[\"*/Unity.SourceGenerators.dll\"]}"

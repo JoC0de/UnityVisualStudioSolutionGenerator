@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.IO;
 using System.Linq;
@@ -11,26 +13,26 @@ namespace UnityVisualStudioSolutionGenerator
     /// </summary>
     public class ProjectFileGeneratorLegacyStyle : ProjectFileGeneratorBase
     {
-        /// <inheritdoc cref="ProjectFileGeneratorBase(XDocument,string)" />
-        public ProjectFileGeneratorLegacyStyle(XDocument document, string filePath)
-            : base(document, filePath)
+        /// <inheritdoc cref="ProjectFileGeneratorBase(string)" />
+        public ProjectFileGeneratorLegacyStyle(string filePath)
+            : base(filePath)
         {
         }
 
         /// <inheritdoc />
-        protected override void WriteProjectFileInternal(XmlWriter writer, string outputFileDirectoryPath)
+        protected override void WriteProjectFileInternal(XmlWriter writer, string outputFileDirectoryPath, string solutionDirectoryPath)
         {
             _ = writer ?? throw new ArgumentNullException(nameof(writer));
             writer.WriteStartDocument();
 
             foreach (var outputPathElement in ProjectElement.Descendants(XmlNamespace + "OutputPath"))
             {
-                outputPathElement.Value = Path.Combine(SolutionDirectoryPath, "Temp", "Bin", "$(Configuration)", ProjectName);
+                outputPathElement.Value = Path.Combine(solutionDirectoryPath, "Temp", "Bin", "$(Configuration)", ProjectName);
             }
 
             foreach (var hintPathElement in ProjectElement.Descendants(XmlNamespace + "HintPath"))
             {
-                hintPathElement.Value = Path.GetFullPath(hintPathElement.Value, SolutionDirectoryPath);
+                hintPathElement.Value = Path.GetFullPath(hintPathElement.Value, DirectoryPath);
             }
 
             ProjectElement.Descendants(XmlNamespace + "Compile").Remove();
@@ -55,9 +57,7 @@ namespace UnityVisualStudioSolutionGenerator
                     continue;
                 }
 
-                includeAttribute.Value = Path.GetRelativePath(
-                    outputFileDirectoryPath,
-                    Path.GetFullPath(includeAttribute.Value, SolutionDirectoryPath));
+                includeAttribute.Value = Path.GetRelativePath(outputFileDirectoryPath, Path.GetFullPath(includeAttribute.Value, DirectoryPath));
                 noneElement.Element(XmlNamespace + "Link")?.Remove();
             }
 
@@ -69,7 +69,7 @@ namespace UnityVisualStudioSolutionGenerator
                     continue;
                 }
 
-                var currentProjectFilePath = Path.GetFullPath(includeAttribute.Value, SolutionDirectoryPath);
+                var currentProjectFilePath = Path.GetFullPath(includeAttribute.Value, DirectoryPath);
                 var newProjectFilePath = DetermineNewProjectFilePath(currentProjectFilePath);
                 includeAttribute.Value = Path.GetRelativePath(outputFileDirectoryPath, newProjectFilePath);
             }
@@ -77,7 +77,7 @@ namespace UnityVisualStudioSolutionGenerator
             ProjectElement.AddFirst(
                 new XElement(
                     XmlNamespace + "PropertyGroup",
-                    new XElement(XmlNamespace + "BaseIntermediateOutputPath", Path.Combine(SolutionDirectoryPath, "Temp", "Obj-Legacy", ProjectName)),
+                    new XElement(XmlNamespace + "BaseIntermediateOutputPath", Path.Combine(solutionDirectoryPath, "obj", "Legacy", ProjectName)),
                     new XElement(XmlNamespace + "EnableNETAnalyzers", "true"),
                     new XElement(XmlNamespace + "AnalysisLevel", "latest"),
                     new XElement(XmlNamespace + "AnalysisMode", "AllEnabledByDefault")));
