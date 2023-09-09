@@ -87,7 +87,7 @@ namespace UnityVisualStudioSolutionGenerator
             writer.WriteEndDocument();
             writer.Flush();
 
-            LogHelper.LogVerbose($"Generated .csproj file for Project: {ProjectName}");
+            LogHelper.LogVerbose($"Generated project file: {ProjectName}.csproj");
         }
     }
 }

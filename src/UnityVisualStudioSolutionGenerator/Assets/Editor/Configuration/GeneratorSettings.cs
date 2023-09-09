@@ -26,6 +26,9 @@ namespace UnityVisualStudioSolutionGenerator
             $"general.{nameof(EnableNullableReferenceTypes)}",
             false);
 
+        [UserSetting("General Settings", "Delete *.cs.meta when deleting *.cs file")]
+        private static readonly GeneratorSettingsValue<bool> TrackMetaDeletionSetting = new($"general.{nameof(TrackMetaDeletion)}", false);
+
         /// <summary>
         ///     Gets or sets a value indicating whether this generator is enabled.
         ///     If disabled Unity will use the 'normal' solution generator.
@@ -62,6 +65,16 @@ namespace UnityVisualStudioSolutionGenerator
         {
             get => EnableNullableReferenceTypesSetting.value;
             set => EnableNullableReferenceTypesSetting.value = value;
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether a background file system watcher should be used to track the deletion of '.cs' files so the '.cs.meta'
+        ///     file is deleted when a user deletes the file with a external tool e.g. with Visual Studio.
+        /// </summary>
+        public static bool TrackMetaDeletion
+        {
+            get => TrackMetaDeletionSetting.value;
+            set => TrackMetaDeletionSetting.value = value;
         }
 
         /// <summary>

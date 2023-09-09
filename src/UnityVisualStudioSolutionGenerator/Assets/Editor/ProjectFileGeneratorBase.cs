@@ -74,6 +74,7 @@ namespace UnityVisualStudioSolutionGenerator
         /// <summary>
         ///     Writes the project file to disk inside <see cref="ProjectOutputFilePath" />.
         /// </summary>
+        /// <param name="solutionDirectoryPath">The absolute path of th directory containing the .sln file.</param>
         /// <returns>The absolute path to witch the file was written.</returns>
         public string WriteProjectFile(string solutionDirectoryPath)
         {
@@ -97,6 +98,28 @@ namespace UnityVisualStudioSolutionGenerator
             WriteProjectFileInternal(innerWriter, outputFileDirectoryPath, solutionDirectoryPath);
 
             return outputFilePath;
+        }
+
+        /// <summary>
+        ///     Creates a new instance of a project file generator, based on the <see cref="GeneratorSettings.GenerateSdkStyleProjects" /> setting.
+        /// </summary>
+        /// <param name="filePath">The path to the .csproj file tho read the information for the new project file content from.</param>
+        /// <returns>The new instance.</returns>
+        internal static ProjectFileGeneratorBase Create(string filePath)
+        {
+            return GeneratorSettings.GenerateSdkStyleProjects
+                ? new ProjectFileGeneratorSdkStyle(filePath)
+                : new ProjectFileGeneratorLegacyStyle(filePath);
+        }
+
+        /// <summary>
+        ///     Determines the root directory that contains all project files, the directory that contains the <see cref="AssemblyDefinitionFilePath" />.
+        /// </summary>
+        /// <returns>The absolute path to the project root directory.</returns>
+        internal string GetProjectRootDirectoryPath()
+        {
+            return Path.GetDirectoryName(AssemblyDefinitionFilePath) ??
+                   throw new InvalidOperationException($"Failed to extract directory path from {assemblyDefinitionFilePath}");
         }
 
         /// <summary>
@@ -133,7 +156,7 @@ namespace UnityVisualStudioSolutionGenerator
         /// </summary>
         /// <param name="writer">The XML writer.</param>
         /// <param name="outputFileDirectoryPath">The absolute path of the output folder.</param>
-        /// <param name="solutionDirectoryPath"></param>
+        /// <param name="solutionDirectoryPath">The absolute path of th directory containing the .sln file.</param>
         protected abstract void WriteProjectFileInternal(XmlWriter writer, string outputFileDirectoryPath, string solutionDirectoryPath);
 
         private static bool MatchesOnePattern(string? value, List<string[]> patterns)

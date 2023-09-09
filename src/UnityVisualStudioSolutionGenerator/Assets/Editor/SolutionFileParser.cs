@@ -69,6 +69,11 @@ namespace UnityVisualStudioSolutionGenerator
 
         private static IEnumerable<ProjectFile> GetUsedProjectFiles(string content, string solutionDirectoryPath)
         {
+            if (!Directory.Exists(solutionDirectoryPath))
+            {
+                LogHelper.LogError($"Generating a solution file inside a directory that doesn't exists. Directory path: {solutionDirectoryPath}");
+            }
+
             var projectIndex = 0;
             while (projectIndex < content.Length)
             {

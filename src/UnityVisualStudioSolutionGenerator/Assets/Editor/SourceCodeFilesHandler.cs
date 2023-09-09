@@ -11,6 +11,9 @@ using UnityEngine;
 
 namespace UnityVisualStudioSolutionGenerator
 {
+    /// <summary>
+    ///     Provides functionalities for manipulation source code files.
+    /// </summary>
     internal static class SourceCodeFilesHandler
     {
         private static readonly byte[] Utf8BomBytes = { 0xEF, 0xBB, 0xBF };
@@ -20,6 +23,10 @@ namespace UnityVisualStudioSolutionGenerator
             0x23, 0x6E, 0x75, 0x6C, 0x6C, 0x61, 0x62, 0x6C, 0x65, 0x20, 0x65, 0x6E, 0x61, 0x62, 0x6C, 0x65,
         };
 
+        /// <summary>
+        ///     Adds the '#nullable enable' to all .cs files of all projects inside the <paramref name="solutionFile" />.
+        /// </summary>
+        /// <param name="solutionFile">The Visual Studio Solution file of witch all .cs files should be manipulated.</param>
         public static void EnableNullableOnAllFiles(SolutionFile solutionFile)
         {
             Debug.Assert(Encoding.UTF8.GetBytes("#nullable enable").SequenceEqual(EnableNullableBytes), "Wrong enableNullableBytes detected.");
@@ -43,6 +50,15 @@ namespace UnityVisualStudioSolutionGenerator
                     AddNullableToFile(sourceCodeFile, enableNullableReadBuffer, fullFileReadBuffer);
                 }
             }
+        }
+
+        /// <summary>
+        ///     Enables nullable of a single file. Adds '#nullable enable' to the top of the file.
+        /// </summary>
+        /// <param name="sourceCodeFile">The path to the file to add nullable setting to, if it doesn't already has it.</param>
+        public static void AddNullableToFile(string sourceCodeFile)
+        {
+            AddNullableToFile(sourceCodeFile, new byte[EnableNullableBytes.Length + 2], new MemoryStream());
         }
 
         private static void AddNullableToFile(string sourceCodeFile, byte[] enableNullableReadBuffer, MemoryStream fullFileReadBuffer)
@@ -96,6 +112,7 @@ namespace UnityVisualStudioSolutionGenerator
                 }
 
                 fullFileReadBuffer.CopyTo(fileStream);
+                LogHelper.LogVerbose($"Added '#nullable enable' to file: '{sourceCodeFile}'.");
             }
             catch (Exception e) when (e is IOException or ArgumentException or InvalidOperationException or AccessViolationException
                                           or IndexOutOfRangeException)

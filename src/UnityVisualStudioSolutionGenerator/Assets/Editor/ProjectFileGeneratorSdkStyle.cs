@@ -131,7 +131,8 @@ namespace UnityVisualStudioSolutionGenerator
 
             wrappedWriter.WriteEndElement(); // </Project>
             wrappedWriter.Flush();
-            LogHelper.LogVerbose($"Generated .csproj file for Project: {ProjectName}");
+
+            LogHelper.LogVerbose($"Generated SDK-style project file: {ProjectName}.csproj");
         }
 
         private sealed class XmlWriterWithoutNamespace : XmlWriter
