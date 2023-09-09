@@ -52,7 +52,7 @@ namespace UnityVisualStudioSolutionGenerator
 
                 if (hashOfOld.SequenceEqual(hashOfNew))
                 {
-                    // nothing changed
+                    // nothing changed -> don't overwrite original file (don't trigger reload in Visual Studio)
                     File.Delete(tempSolutionFilePath);
                     return;
                 }

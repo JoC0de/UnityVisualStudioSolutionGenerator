@@ -21,6 +21,14 @@ namespace UnityVisualStudioSolutionGenerator
         [UserSetting("General Settings", "Enable verbose logging")]
         private static readonly GeneratorSettingsValue<bool> LogVerboseSetting = new($"general.{nameof(LogVerbose)}", false);
 
+        [UserSetting("General Settings", "Enable nullable reference type checking", "Add '#nullable enable' at the top of each '.cs' file.")]
+        private static readonly GeneratorSettingsValue<bool> EnableNullableReferenceTypesSetting = new(
+            $"general.{nameof(EnableNullableReferenceTypes)}",
+            false);
+
+        [UserSetting("General Settings", "Delete *.cs.meta when deleting *.cs file")]
+        private static readonly GeneratorSettingsValue<bool> TrackMetaDeletionSetting = new($"general.{nameof(TrackMetaDeletion)}", false);
+
         /// <summary>
         ///     Gets or sets a value indicating whether this generator is enabled.
         ///     If disabled Unity will use the 'normal' solution generator.
@@ -47,6 +55,26 @@ namespace UnityVisualStudioSolutionGenerator
         {
             get => LogVerboseSetting.value;
             set => LogVerboseSetting.value = value;
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether to add '#nullable enable' at the top of each '.cs' file.
+        ///     <see href="https://learn.microsoft.com/en-us/dotnet/csharp/nullable-references" />.
+        /// </summary>
+        public static bool EnableNullableReferenceTypes
+        {
+            get => EnableNullableReferenceTypesSetting.value;
+            set => EnableNullableReferenceTypesSetting.value = value;
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether a background file system watcher should be used to track the deletion of '.cs' files so the '.cs.meta'
+        ///     file is deleted when a user deletes the file with a external tool e.g. with Visual Studio.
+        /// </summary>
+        public static bool TrackMetaDeletion
+        {
+            get => TrackMetaDeletionSetting.value;
+            set => TrackMetaDeletionSetting.value = value;
         }
 
         /// <summary>

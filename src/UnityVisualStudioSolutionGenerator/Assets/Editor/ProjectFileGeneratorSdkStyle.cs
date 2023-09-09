@@ -12,22 +12,22 @@ namespace UnityVisualStudioSolutionGenerator
     /// </summary>
     public class ProjectFileGeneratorSdkStyle : ProjectFileGeneratorBase
     {
-        /// <inheritdoc cref="ProjectFileGeneratorBase(XDocument,string)" />
-        public ProjectFileGeneratorSdkStyle(XDocument document, string filePath)
-            : base(document, filePath)
+        /// <inheritdoc cref="ProjectFileGeneratorBase(string)" />
+        public ProjectFileGeneratorSdkStyle(string filePath)
+            : base(filePath)
         {
         }
 
         /// <inheritdoc />
-        protected override void WriteProjectFileInternal(XmlWriter writer, string outputFileDirectoryPath)
+        protected override void WriteProjectFileInternal(XmlWriter writer, string outputFileDirectoryPath, string solutionDirectoryPath)
         {
             using var wrappedWriter = new XmlWriterWithoutNamespace(writer);
 
             wrappedWriter.WriteStartElement("Project");
 
             wrappedWriter.WriteStartElement("PropertyGroup");
-            wrappedWriter.WriteElementString("OutputPath", Path.Combine(SolutionDirectoryPath, "Temp", "Bin", "$(Configuration)", ProjectName));
-            wrappedWriter.WriteElementString("BaseIntermediateOutputPath", Path.Combine(SolutionDirectoryPath, "Temp", "Obj", ProjectName));
+            wrappedWriter.WriteElementString("OutputPath", Path.Combine(solutionDirectoryPath, "Temp", "Bin", "$(Configuration)", ProjectName));
+            wrappedWriter.WriteElementString("BaseIntermediateOutputPath", Path.Combine(solutionDirectoryPath, "obj", "Sdk", ProjectName));
             wrappedWriter.WriteElementString("IsUnityProject", "true");
             wrappedWriter.WriteEndElement(); // </PropertyGroup>
 
@@ -96,7 +96,7 @@ namespace UnityVisualStudioSolutionGenerator
                     var hintPathElement = includedItem.Element(XmlNamespace + "HintPath");
                     if (hintPathElement != null)
                     {
-                        hintPathElement.Value = Path.GetFullPath(hintPathElement.Value, SolutionDirectoryPath);
+                        hintPathElement.Value = Path.GetFullPath(hintPathElement.Value, DirectoryPath);
                     }
 
                     includedItem.WriteTo(wrappedWriter);
@@ -115,7 +115,7 @@ namespace UnityVisualStudioSolutionGenerator
                     continue;
                 }
 
-                var currentProjectFilePath = Path.GetFullPath(includeAttribute.Value, SolutionDirectoryPath);
+                var currentProjectFilePath = Path.GetFullPath(includeAttribute.Value, DirectoryPath);
                 var newProjectFilePath = DetermineNewProjectFilePath(currentProjectFilePath);
                 includeAttribute.Value = Path.GetRelativePath(outputFileDirectoryPath, newProjectFilePath);
                 projectReferenceElement.WriteTo(wrappedWriter);
@@ -131,7 +131,8 @@ namespace UnityVisualStudioSolutionGenerator
 
             wrappedWriter.WriteEndElement(); // </Project>
             wrappedWriter.Flush();
-            LogHelper.LogVerbose($"Generated .csproj file for Project: {ProjectName}");
+
+            LogHelper.LogVerbose($"Generated SDK-style project file: {ProjectName}.csproj");
         }
 
         private sealed class XmlWriterWithoutNamespace : XmlWriter
