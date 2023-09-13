@@ -3,7 +3,7 @@
 using System;
 using UnityEngine;
 
-namespace UnityVisualStudioSolutionGenerator
+namespace UnityVisualStudioSolutionGenerator.Configuration
 {
     /// <summary>
     ///     Data container for a PropertyGroup that should be included in the generated .csproj file.

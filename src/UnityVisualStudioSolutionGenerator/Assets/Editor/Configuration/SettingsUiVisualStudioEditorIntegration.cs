@@ -4,7 +4,7 @@ using Microsoft.Unity.VisualStudio.Editor;
 using Unity.CodeEditor;
 using UnityEditor.SettingsManagement;
 
-namespace UnityVisualStudioSolutionGenerator
+namespace UnityVisualStudioSolutionGenerator.Configuration
 {
     /// <summary>
     ///     The part of the settings UI that integrates the settings from the Unity visual studio editor plugin.

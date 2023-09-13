@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using UnityEditor.SettingsManagement;
 
-namespace UnityVisualStudioSolutionGenerator
+namespace UnityVisualStudioSolutionGenerator.Configuration
 {
     /// <summary>
     ///     Provides settings used for generating the Visual Studio Solution File.
@@ -28,6 +28,14 @@ namespace UnityVisualStudioSolutionGenerator
 
         [UserSetting("General Settings", "Delete *.cs.meta when deleting *.cs file")]
         private static readonly GeneratorSettingsValue<bool> TrackMetaDeletionSetting = new($"general.{nameof(TrackMetaDeletion)}", false);
+
+        [UserSetting(
+            "General Settings",
+            "Generate ReSharper project level settings",
+            "Generates one .csproj.DotSettings per .csproj file configuring the folder to be skipped from namespace.")]
+        private static readonly GeneratorSettingsValue<bool> GenerateReSharperProjectSettingsSetting = new(
+            $"general.{nameof(GenerateReSharperProjectSettings)}",
+            false);
 
         /// <summary>
         ///     Gets or sets a value indicating whether this generator is enabled.
@@ -75,6 +83,16 @@ namespace UnityVisualStudioSolutionGenerator
         {
             get => TrackMetaDeletionSetting.value;
             set => TrackMetaDeletionSetting.value = value;
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether to generate a ReSharper settings file (.csproj.DotSettings) for each .csproj file. It contains value so
+        ///     that the namespace of code is expected to start at the project root and all sup directories should be included in the namespace.
+        /// </summary>
+        public static bool GenerateReSharperProjectSettings
+        {
+            get => GenerateReSharperProjectSettingsSetting.value;
+            set => GenerateReSharperProjectSettingsSetting.value = value;
         }
 
         /// <summary>

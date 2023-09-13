@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityVisualStudioSolutionGenerator.Configuration;
 
 namespace UnityVisualStudioSolutionGenerator
 {
@@ -57,6 +58,7 @@ namespace UnityVisualStudioSolutionGenerator
 
                 var newProjectFilePath = generator.WriteProjectFile(solutionDirectoryPath);
 
+                ReSharperProjectSettingsGenerator.WriteSettingsIfMissing(newProjectFilePath);
                 ProjectSourceCodeWatcherManager.AddSourceCodeWatcherForProject(GetDirectoryPath(newProjectFilePath));
                 newProjects.Add(new ProjectFile(newProjectFilePath, project.Id));
             }

@@ -2,6 +2,7 @@
 
 using System;
 using UnityEngine;
+using UnityVisualStudioSolutionGenerator.Configuration;
 
 namespace UnityVisualStudioSolutionGenerator
 {

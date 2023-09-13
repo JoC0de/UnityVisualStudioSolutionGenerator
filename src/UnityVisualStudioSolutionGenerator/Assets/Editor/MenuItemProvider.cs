@@ -2,6 +2,7 @@
 using Microsoft.Unity.VisualStudio.Editor;
 using Unity.CodeEditor;
 using UnityEditor;
+using UnityVisualStudioSolutionGenerator.Configuration;
 
 namespace UnityVisualStudioSolutionGenerator
 {

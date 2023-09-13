@@ -2,7 +2,7 @@
 
 using UnityEditor.SettingsManagement;
 
-namespace UnityVisualStudioSolutionGenerator
+namespace UnityVisualStudioSolutionGenerator.Configuration
 {
     /// <summary>
     ///     A setting value that is stored in the <see cref="GeneratorSettingsManager.Instance" />.
