@@ -7,7 +7,7 @@ using UnityEditor.SettingsManagement;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace UnityVisualStudioSolutionGenerator
+namespace UnityVisualStudioSolutionGenerator.Configuration
 {
     /// <summary>
     ///     Helper for drawing <see cref="ReorderableList" />s in the settings UI.

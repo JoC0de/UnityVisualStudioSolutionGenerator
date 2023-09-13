@@ -3,7 +3,7 @@
 using System;
 using UnityEditor.SettingsManagement;
 
-namespace UnityVisualStudioSolutionGenerator
+namespace UnityVisualStudioSolutionGenerator.Configuration
 {
     /// <summary>
     ///     Stores the singleton instance of the settings of this package.

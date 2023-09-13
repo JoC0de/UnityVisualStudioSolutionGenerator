@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using UnityEditor;
 using UnityEditor.SettingsManagement;
 
-namespace UnityVisualStudioSolutionGenerator
+namespace UnityVisualStudioSolutionGenerator.Configuration
 {
     /// <summary>
     ///     Provides the settings of this package to the Unity preferences window.

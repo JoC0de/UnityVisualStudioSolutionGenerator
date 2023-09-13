@@ -6,7 +6,7 @@ using UnityEditor.SettingsManagement;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace UnityVisualStudioSolutionGenerator
+namespace UnityVisualStudioSolutionGenerator.Configuration
 {
     /// <summary>
     ///     The part of the settings UI that handles the section for: <see cref="GeneratorSettings.SdkExcludedFilePatterns" />.
