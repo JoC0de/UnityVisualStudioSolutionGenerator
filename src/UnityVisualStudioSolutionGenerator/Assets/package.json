@@ -1,7 +1,7 @@
 {
     "name": "com.github-joc0de.visual-studio-solution-generator",
     "displayName": "Unity Visual Studio Solution Generator",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "Visual Studio Solution Generator with improved developer productivity especially when working with multi-package unity projects",
     "unity": "2021.2",
     "keywords": [

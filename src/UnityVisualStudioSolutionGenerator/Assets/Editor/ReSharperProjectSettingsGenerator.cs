@@ -32,6 +32,11 @@ namespace UnityVisualStudioSolutionGenerator
             var projectDirectory = Path.GetDirectoryName(projectFilePath) ??
                                    throw new InvalidOperationException($"Failed to get directory name of path '{projectFilePath}'");
             var projectSupDirectoriesEncoded = Directory.EnumerateDirectories(projectDirectory, "*", SearchOption.AllDirectories)
+                .Where(
+                    directory =>
+                        Directory.EnumerateFiles(directory, "*.cs", SearchOption.AllDirectories).Any() && // only if directory has source code
+                        !Directory.EnumerateFiles(directory, "*.asmdef", SearchOption.TopDirectoryOnly).Any() && // exclude sub-projects
+                        !Directory.EnumerateFiles(directory, "*.asmref", SearchOption.TopDirectoryOnly).Any()) // exclude sub-projects references
                 .Select(
                     directory => Path.GetRelativePath(projectDirectory, directory)
                         .ToLowerInvariant()
