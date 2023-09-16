@@ -1,3 +1,5 @@
+[![openupm](https://img.shields.io/npm/v/com.github-joc0de.visual-studio-solution-generator?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.github-joc0de.visual-studio-solution-generator/) ![main github action workflow](https://github.com/JoC0de/UnityVisualStudioSolutionGenerator/actions/workflows/main.yml/badge.svg) [![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![GitHub Release](https://img.shields.io/github/v/release/JoC0de/UnityVisualStudioSolutionGenerator.svg)](https://github.com/JoC0de/UnityVisualStudioSolutionGenerator/releases/latest)
+
 # Unity Visual Studio Solution Generator
 
 Visual Studio Solution Generator for Unity to improve developer productivity when working with multi-package unity projects.
