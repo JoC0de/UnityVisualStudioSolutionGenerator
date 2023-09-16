@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -31,12 +32,7 @@ namespace UnityVisualStudioSolutionGenerator
             var settingsFilePath = $"{projectFilePath}.DotSettings";
             var projectDirectory = Path.GetDirectoryName(projectFilePath) ??
                                    throw new InvalidOperationException($"Failed to get directory name of path '{projectFilePath}'");
-            var projectSupDirectoriesEncoded = Directory.EnumerateDirectories(projectDirectory, "*", SearchOption.AllDirectories)
-                .Where(
-                    directory =>
-                        Directory.EnumerateFiles(directory, "*.cs", SearchOption.AllDirectories).Any() && // only if directory has source code
-                        !Directory.EnumerateFiles(directory, "*.asmdef", SearchOption.TopDirectoryOnly).Any() && // exclude sub-projects
-                        !Directory.EnumerateFiles(directory, "*.asmref", SearchOption.TopDirectoryOnly).Any()) // exclude sub-projects references
+            var projectSupDirectoriesEncoded = GetSupDirectoriesWithSourceCode(projectDirectory)
                 .Select(
                     directory => Path.GetRelativePath(projectDirectory, directory)
                         .ToLowerInvariant()
@@ -65,6 +61,27 @@ namespace UnityVisualStudioSolutionGenerator
 
             writer.WriteLine("</wpf:ResourceDictionary>");
             LogHelper.LogVerbose($"Generated ReSharper project settings file {Path.GetFileName(settingsFilePath)}");
+        }
+
+        private static IEnumerable<string> GetSupDirectoriesWithSourceCode(string directoryPath)
+        {
+            foreach (var subDirectory in Directory.EnumerateDirectories(directoryPath))
+            {
+                if (Directory.EnumerateFiles(subDirectory, "*.asmdef", SearchOption.TopDirectoryOnly).Any() ||
+                    Directory.EnumerateFiles(subDirectory, "*.asmref", SearchOption.TopDirectoryOnly).Any() ||
+                    !Directory.EnumerateFiles(subDirectory, "*.cs", SearchOption.AllDirectories).Any())
+                {
+                    // exclude sub-projects and only keep if any sub-directory has source code
+                    continue;
+                }
+
+                yield return subDirectory;
+
+                foreach (var subSubDirectory in GetSupDirectoriesWithSourceCode(subDirectory))
+                {
+                    yield return subSubDirectory;
+                }
+            }
         }
     }
 }
