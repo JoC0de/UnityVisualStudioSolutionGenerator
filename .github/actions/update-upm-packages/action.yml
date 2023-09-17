@@ -40,12 +40,12 @@ runs:
       shell: bash
       if: |
         steps.check-changes.outputs.has-changes == 'True'
-      run: >
+      run: |
         gh issue create --label "dependencies" --title "Update UPM package dependencies" --repo $GITHUB_REPOSITORY --body "
-        <details>
-          <summary>Diff containing updates:</summary>
-          $(git diff)
-        </details>
+        ## Diff containing updates:
+        ```diff
+        $(git diff)
+        ```
         "
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
