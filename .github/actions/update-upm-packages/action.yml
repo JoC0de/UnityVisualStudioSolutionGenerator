@@ -42,12 +42,13 @@ runs:
         steps.check-changes.outputs.has-changes == 'True'
       run: |
         $gitDiff = git diff | Out-String
-        $issueBody = "
+        Set-Content -Path body.txt -Value "
         ## Diff containing updates:
         ``````diff
         $gitDiff
         ``````
-        ";
-        gh issue create --label "dependencies" --title "Update UPM package dependencies" --repo $env:GITHUB_REPOSITORY --body $issueBody
+        "
+        gh issue create --label "dependencies" --title "Update UPM package dependencies" --repo $env:GITHUB_REPOSITORY --body-file body.txt
+        Remove-Item -Path 'body.txt'
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
