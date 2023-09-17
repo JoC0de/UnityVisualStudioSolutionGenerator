@@ -1,0 +1,35 @@
+name: Update UPM packages
+description: Check for updates of any UPM package and update it inside the package.json
+inputs:
+  project-root-path:
+    description: The root path of the Unity project. The folder containing the Assets folder.
+    required: true
+  excluded-package-patterns:
+    required: false
+    description: A list of wildcard patterns used to exclude packages from being checked for updates. Each value should be separated by a new line.
+    default: |
+      com.unity.2d.sprite
+      com.unity.modules.*
+  package-json-files-to-update:
+    required: false
+    description: A list of 'package.json' files that should be updated so that its dependency version numbers match the one from the updated packages. Each value should be a path to a 'package.json' file relative to 'project-root-path' separated by a new line.
+    default: ""
+runs:
+  using: composite
+  steps:
+    - name: Update used package version numbers
+      shell: pwsh
+      run: >
+        ./update-upm-packages.ps1
+        -ProjectPath ('${{ inputs.project-root-path }}'.Split([string[]]@("`n", "`r`n"), [StringSplitOptions]::RemoveEmptyEntries))
+        -ExcludedPackagePatterns ('${{ inputs.excluded-package-patterns }}'.Split([string[]]@("`n", "`r`n"), [StringSplitOptions]::RemoveEmptyEntries))
+        -PackageJsonFilesToUpdate ('${{ inputs.package-json-files-to-update }}'.Split([string[]]@("`n", "`r`n"), [StringSplitOptions]::RemoveEmptyEntries))
+
+    - name: Check changes
+      id: check-changes
+      shell: pwsh
+      run: echo "has-changes=$((git status --porcelain).Length -eq 0)" >> $env:GITHUB_OUTPUT
+
+    - name: TODO
+      shell: bash
+      run: echo '${{ steps.check-changes.outputs.has-changes }}'
