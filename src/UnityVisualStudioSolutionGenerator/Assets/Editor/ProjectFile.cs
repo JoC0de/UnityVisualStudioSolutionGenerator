@@ -50,7 +50,8 @@ namespace UnityVisualStudioSolutionGenerator
 
         private bool Equals(ProjectFile other)
         {
-            return Id == other.Id;
+            // we need to use the FilePath as an alternative so we detect duplicate entries inside .sln
+            return Id == other.Id || FilePath == other.FilePath;
         }
     }
 }

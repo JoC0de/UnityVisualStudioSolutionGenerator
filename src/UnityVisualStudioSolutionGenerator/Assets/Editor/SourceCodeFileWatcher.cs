@@ -49,6 +49,10 @@ namespace UnityVisualStudioSolutionGenerator
             {
                 File.Delete($"{e.FullPath}.meta");
             }
+            catch (Exception exception) when (exception is FileNotFoundException or DirectoryNotFoundException)
+            {
+                LogHelper.LogVerbose($".meta file corresponding to: '{e.FullPath}' already deleted. Error:\n{exception}");
+            }
             catch (Exception exception) when (exception is AccessViolationException or IOException)
             {
                 LogHelper.LogWarning($"Failed to delete .meta corresponding to: '{e.FullPath}'. Error:\n{exception}");

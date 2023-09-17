@@ -31,7 +31,7 @@ namespace UnityVisualStudioSolutionGenerator
         {
             Debug.Assert(Encoding.UTF8.GetBytes("#nullable enable").SequenceEqual(EnableNullableBytes), "Wrong enableNullableBytes detected.");
 
-            var allProjects = SolutionFileParser.Parse(solutionFile, false);
+            var (allProjects, _) = SolutionFileParser.Parse(solutionFile, false);
             var enableNullableReadBuffer = new byte[EnableNullableBytes.Length + 2];
 
             // source code is small so we can read it into memory

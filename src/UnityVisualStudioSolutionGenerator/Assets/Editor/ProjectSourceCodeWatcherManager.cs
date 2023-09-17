@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEditor;
 using UnityVisualStudioSolutionGenerator.Configuration;
 
 namespace UnityVisualStudioSolutionGenerator
@@ -31,6 +30,58 @@ namespace UnityVisualStudioSolutionGenerator
                 return;
             }
 
+            AddSourceCodeWatcherForProjectInternal(projectRootDirectoryPath);
+        }
+
+        /// <summary>
+        ///     Create all required <see cref="SourceCodeFileWatcher" />'s for the <paramref name="projectFiles" /> should be called after the domain is reloaded
+        ///     and therefor all <see cref="SourceCodeFileWatcher" />'s are destroyed.
+        /// </summary>
+        /// <param name="projectFiles">All project files from the .sln.</param>
+        public static void Initialize(IEnumerable<ProjectFile> projectFiles)
+        {
+            if (!FileWatcherFeatureEnabled())
+            {
+                DisableProjectSourceCodeWatchers();
+                return;
+            }
+
+            foreach (var project in projectFiles)
+            {
+                if (!File.Exists(project.FilePath))
+                {
+                    continue;
+                }
+
+                string projectRootDirectoryPath;
+                if (File.Exists(Path.ChangeExtension(project.FilePath, ".asmdef")))
+                {
+                    // fast path without needing to read the content of the .csproj because the .asmdef file is directly next to the .csproj file.
+                    if (ProjectFileParser.IsProjectFileFromPackageCache(project.FilePath))
+                    {
+                        continue;
+                    }
+
+                    projectRootDirectoryPath = ProjectFileParser.GetProjectRootDirectoryPath(project.FilePath);
+                }
+                else
+                {
+                    var generator = ProjectFileGeneratorBase.Create(project.FilePath);
+
+                    if (generator.IsProjectFromPackageCache())
+                    {
+                        continue;
+                    }
+
+                    projectRootDirectoryPath = generator.GetProjectRootDirectoryPath();
+                }
+
+                AddSourceCodeWatcherForProjectInternal(projectRootDirectoryPath);
+            }
+        }
+
+        private static void AddSourceCodeWatcherForProjectInternal(string projectRootDirectoryPath)
+        {
             var projectDirectoryPathWithSeparator = projectRootDirectoryPath + Path.DirectorySeparatorChar;
             if (ProjectSourceCodeWatchers.Keys.Any(
                     watchedDirectoryPath => projectDirectoryPathWithSeparator.StartsWith(watchedDirectoryPath, StringComparison.OrdinalIgnoreCase)))
@@ -39,39 +90,6 @@ namespace UnityVisualStudioSolutionGenerator
             }
 
             ProjectSourceCodeWatchers.Add(projectDirectoryPathWithSeparator, new SourceCodeFileWatcher(projectRootDirectoryPath));
-        }
-
-        [InitializeOnLoadMethod]
-        private static void Initialize()
-        {
-            if (!FileWatcherFeatureEnabled())
-            {
-                DisableProjectSourceCodeWatchers();
-                return;
-            }
-
-            var solutionFile = SolutionFile.CurrentProjectSolution;
-            if (!File.Exists(solutionFile.SolutionFilePath))
-            {
-                LogHelper.LogVerbose(
-                    $"Skipping {nameof(ProjectSourceCodeWatcherManager)}.{nameof(Initialize)} because '{Path.GetFileName(solutionFile.SolutionFilePath)}' doesn't exist.");
-                return;
-            }
-
-            var allProjects = SolutionFileParser.Parse(solutionFile, false);
-            foreach (var project in allProjects)
-            {
-                var generator = ProjectFileGeneratorBase.Create(project.FilePath);
-
-                if (generator.IsProjectFromPackageCache())
-                {
-                    continue;
-                }
-
-                var projectRootDirectoryPath = generator.GetProjectRootDirectoryPath();
-
-                AddSourceCodeWatcherForProject(projectRootDirectoryPath);
-            }
         }
 
         private static bool FileWatcherFeatureEnabled()
