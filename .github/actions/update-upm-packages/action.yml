@@ -21,7 +21,7 @@ runs:
       shell: pwsh
       run: >
         & $env:GITHUB_ACTION_PATH/update-upm-packages.ps1
-        -ProjectPath ('${{ inputs.project-root-path }}'.Split([string[]]@("`n", "`r`n"), [StringSplitOptions]::RemoveEmptyEntries))
+        -ProjectPath '${{ inputs.project-root-path }}'
         -ExcludedPackagePatterns ('${{ inputs.excluded-package-patterns }}'.Split([string[]]@("`n", "`r`n"), [StringSplitOptions]::RemoveEmptyEntries))
         -PackageJsonFilesToUpdate ('${{ inputs.package-json-files-to-update }}'.Split([string[]]@("`n", "`r`n"), [StringSplitOptions]::RemoveEmptyEntries))
 
