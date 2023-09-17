@@ -44,7 +44,7 @@ runs:
         $issueBody = "
         ## Diff containing updates:
         ``````diff
-        $(git diff)
+        $(git diff | Out-String)
         ``````
         ";
         gh issue create --label "dependencies" --title "Update UPM package dependencies" --repo $env:GITHUB_REPOSITORY --body $issueBody
