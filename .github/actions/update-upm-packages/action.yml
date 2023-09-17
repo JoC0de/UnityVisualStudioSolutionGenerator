@@ -30,10 +30,19 @@ runs:
       shell: pwsh
       run: |
         git diff
-        git status --porcelain
         $gitStatus = git status --porcelain
-        echo "has-changes=$($gitStatus.Length -eq 0)" >> $env:GITHUB_OUTPUT
+        echo "has-changes=$($gitStatus.Length -ne 0)" >> $env:GITHUB_OUTPUT
 
-    - name: TODO
+    - name: Create Issue with update
       shell: bash
-      run: echo '${{ steps.check-changes.outputs.has-changes }}'
+      if: |
+        steps.check-changes.outputs.has-changes == 'True'
+      run: >
+        gh issue create --label "dependencies" --title "Update UPM package dependencies" --repo $GITHUB_REPOSITORY --body "
+        <details>
+          <summary>Diff containing updates:</summary>
+          $(git diff)
+        </details>
+        "
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
