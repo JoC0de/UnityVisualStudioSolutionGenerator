@@ -41,10 +41,11 @@ runs:
       if: |
         steps.check-changes.outputs.has-changes == 'True'
       run: |
+        $gitDiff = git diff | Out-String
         $issueBody = "
         ## Diff containing updates:
         ``````diff
-        $(git diff | Out-String)
+        $gitDiff
         ``````
         ";
         gh issue create --label "dependencies" --title "Update UPM package dependencies" --repo $env:GITHUB_REPOSITORY --body $issueBody
