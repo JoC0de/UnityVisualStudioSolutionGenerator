@@ -26,3 +26,4 @@ jobs:
           project-root-path: src/UnityVisualStudioSolutionGenerator
           package-json-files-to-update: |
             Assets/package.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
