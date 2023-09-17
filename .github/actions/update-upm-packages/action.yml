@@ -28,7 +28,11 @@ runs:
     - name: Check changes
       id: check-changes
       shell: pwsh
-      run: echo "has-changes=$((git status --porcelain).Length -eq 0)" >> $env:GITHUB_OUTPUT
+      run: |
+        git diff
+        git status --porcelain
+        $gitStatus = git status --porcelain
+        echo "has-changes=$($gitStatus.Length -eq 0)" >> $env:GITHUB_OUTPUT
 
     - name: TODO
       shell: bash
