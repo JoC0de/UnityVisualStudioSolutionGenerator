@@ -1,5 +1,5 @@
 #nullable enable
-using Microsoft.Unity.VisualStudio.Editor;
+
 using Unity.CodeEditor;
 using UnityEditor;
 using UnityVisualStudioSolutionGenerator.Configuration;
@@ -27,7 +27,7 @@ namespace UnityVisualStudioSolutionGenerator
         [MenuItem("Visual Studio/Open Solution", true)]
         public static bool OpenSolutionEnabled()
         {
-            return IsVisualStudioEditorEnabled();
+            return GeneratorSettings.IsVisualStudioEditorEnabled();
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace UnityVisualStudioSolutionGenerator
         [MenuItem("Visual Studio/Generate Solution (Sdk-Style)", true)]
         public static bool SyncSolutionSdkStyleEnabled()
         {
-            return IsSolutionGeneratorEnabled();
+            return GeneratorSettings.IsSolutionGeneratorEnabled();
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace UnityVisualStudioSolutionGenerator
         [MenuItem("Visual Studio/Generate Solution (Legacy-Style)", true)]
         public static bool SyncSolutionLegacyStyleEnabled()
         {
-            return IsSolutionGeneratorEnabled();
+            return GeneratorSettings.IsSolutionGeneratorEnabled();
         }
 
         /// <summary>
@@ -96,16 +96,6 @@ namespace UnityVisualStudioSolutionGenerator
         public static void OpenPreferences()
         {
             SettingsService.OpenProjectSettings(GeneratorSettingsProvider.PreferencesPath);
-        }
-
-        private static bool IsSolutionGeneratorEnabled()
-        {
-            return GeneratorSettings.IsEnabled && IsVisualStudioEditorEnabled();
-        }
-
-        private static bool IsVisualStudioEditorEnabled()
-        {
-            return CodeEditor.CurrentEditor is VisualStudioEditor;
         }
     }
 }

@@ -1,6 +1,8 @@
 #nullable enable
 
 using System.Collections.Generic;
+using Microsoft.Unity.VisualStudio.Editor;
+using Unity.CodeEditor;
 using UnityEditor.SettingsManagement;
 
 namespace UnityVisualStudioSolutionGenerator.Configuration
@@ -138,5 +140,24 @@ namespace UnityVisualStudioSolutionGenerator.Configuration
         public static GeneratorSettingsValue<List<string>> ExcludedAnalyzersSetting { get; } = new(
             $"legacy-style.{nameof(ExcludedAnalyzers)}",
             new List<string> { "*/Unity.SourceGenerators.dll" });
+
+        /// <summary>
+        ///     Gets a value indicating whether this generator is enabled and Visual Studio is the current external tool enabled inside Unity settings.
+        ///     If disabled Unity will use the 'normal' solution generator.
+        /// </summary>
+        /// <returns>True if <see cref="IsEnabled" /> and <see cref="IsVisualStudioEditorEnabled" />.</returns>
+        internal static bool IsSolutionGeneratorEnabled()
+        {
+            return IsEnabled && IsVisualStudioEditorEnabled();
+        }
+
+        /// <summary>
+        ///     Gets a value indicating whether the current external tool enabled inside Unity settings.
+        /// </summary>
+        /// <returns>True if <see cref="CodeEditor.CurrentEditor" /> is the <see cref="VisualStudioEditor" />.</returns>
+        internal static bool IsVisualStudioEditorEnabled()
+        {
+            return CodeEditor.CurrentEditor is VisualStudioEditor;
+        }
     }
 }

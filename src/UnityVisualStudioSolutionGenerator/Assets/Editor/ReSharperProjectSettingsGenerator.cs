@@ -32,6 +32,11 @@ namespace UnityVisualStudioSolutionGenerator
             var settingsFilePath = $"{projectFilePath}.DotSettings";
             var projectDirectory = Path.GetDirectoryName(projectFilePath) ??
                                    throw new InvalidOperationException($"Failed to get directory name of path '{projectFilePath}'");
+            if (!Path.IsPathFullyQualified(projectDirectory))
+            {
+                throw new InvalidOperationException($"'{projectDirectory}' is not absolute, got file path: '{projectFilePath}'.");
+            }
+
             var projectSupDirectoriesEncoded = GetSupDirectoriesWithSourceCode(projectDirectory)
                 .Select(
                     directory => Path.GetRelativePath(projectDirectory, directory)

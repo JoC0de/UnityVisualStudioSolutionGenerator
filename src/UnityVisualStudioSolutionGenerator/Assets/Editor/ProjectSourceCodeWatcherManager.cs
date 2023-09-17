@@ -51,6 +51,13 @@ namespace UnityVisualStudioSolutionGenerator
             }
 
             var solutionFile = SolutionFile.CurrentProjectSolution;
+            if (!File.Exists(solutionFile.SolutionFilePath))
+            {
+                LogHelper.LogVerbose(
+                    $"Skipping {nameof(ProjectSourceCodeWatcherManager)}.{nameof(Initialize)} because '{Path.GetFileName(solutionFile.SolutionFilePath)}' doesn't exist.");
+                return;
+            }
+
             var allProjects = SolutionFileParser.Parse(solutionFile, false);
             foreach (var project in allProjects)
             {
@@ -69,7 +76,8 @@ namespace UnityVisualStudioSolutionGenerator
 
         private static bool FileWatcherFeatureEnabled()
         {
-            return GeneratorSettings.IsEnabled && (GeneratorSettings.TrackMetaDeletion || GeneratorSettings.EnableNullableReferenceTypes);
+            return GeneratorSettings.IsSolutionGeneratorEnabled() &&
+                   (GeneratorSettings.TrackMetaDeletion || GeneratorSettings.EnableNullableReferenceTypes);
         }
 
         private static void DisableProjectSourceCodeWatchers()
