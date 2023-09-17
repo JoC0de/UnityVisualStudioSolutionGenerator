@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   update-upm-packages:
-    name: Test on Linux
+    name: Update UPM packages
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
