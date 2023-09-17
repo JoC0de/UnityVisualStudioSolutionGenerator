@@ -3,7 +3,9 @@ name: Update UPM packages
 on:
   workflow_dispatch: {}
   schedule:
-    - "29 6 * * 0" # each Sunday at 06:29
+    - cron: "29 6 * * 0" # each Sunday at 06:29
+  push:
+    branches: ["feature/unity-update-ckeck-github-action"] # TODO: remove
 
 permissions:
   actions: read
