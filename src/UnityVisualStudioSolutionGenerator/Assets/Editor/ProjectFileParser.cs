@@ -79,11 +79,22 @@ namespace UnityVisualStudioSolutionGenerator
         }
 
         /// <summary>
+        ///     Determines the root directory that contains all project files, using the file path of the .asmdef.
+        /// </summary>
+        /// <param name="assemblyDefinitionFilePath">The absolute path of the .asmdef file of the project to get the root directory path of.</param>
+        /// <returns>The absolute path to the project root directory.</returns>
+        internal static string GetProjectRootDirectoryPath(string assemblyDefinitionFilePath)
+        {
+            return Path.GetDirectoryName(assemblyDefinitionFilePath) ??
+                   throw new InvalidOperationException($"Failed to extract directory path from '{assemblyDefinitionFilePath}'");
+        }
+
+        /// <summary>
         ///     Determines whether the project is from the package cache.
         /// </summary>
         /// <param name="projectFilePath">The absolute path to one project file (can also be a file that lies inside the project folder).</param>
         /// <returns>True if the project file is from a package that is located inside the 'PackageCache', False otherwise.</returns>
-        protected static bool IsProjectFileFromPackageCache(string projectFilePath)
+        internal static bool IsProjectFileFromPackageCache(string projectFilePath)
         {
             _ = projectFilePath ?? throw new ArgumentNullException(nameof(projectFilePath));
 

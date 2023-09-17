@@ -119,8 +119,7 @@ namespace UnityVisualStudioSolutionGenerator
         /// <returns>The absolute path to the project root directory.</returns>
         internal string GetProjectRootDirectoryPath()
         {
-            return Path.GetDirectoryName(AssemblyDefinitionFilePath) ??
-                   throw new InvalidOperationException($"Failed to extract directory path from {assemblyDefinitionFilePath}");
+            return GetProjectRootDirectoryPath(AssemblyDefinitionFilePath);
         }
 
         /// <summary>
@@ -130,8 +129,8 @@ namespace UnityVisualStudioSolutionGenerator
         /// <returns>The new project file path.</returns>
         protected static string DetermineNewProjectFilePath(string projectFilePath)
         {
-            var projectXml = new ProjectFileGeneratorSdkStyle(projectFilePath);
-            return projectXml.IsProjectFromPackageCache() ? projectFilePath : projectXml.ProjectOutputFilePath;
+            var project = new ProjectFileGeneratorSdkStyle(projectFilePath);
+            return project.IsProjectFromPackageCache() ? projectFilePath : project.ProjectOutputFilePath;
         }
 
         /// <summary>

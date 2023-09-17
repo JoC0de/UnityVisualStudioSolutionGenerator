@@ -56,7 +56,7 @@ EndGlobal
         [Test]
         public void ParseSolutionTest()
         {
-            var projectFiles = SolutionFileParser.Parse(TestSolutionContent, SolutionDirectoryPath, false);
+            var (projectFiles, _) = SolutionFileParser.Parse(TestSolutionContent, SolutionDirectoryPath, false);
 
             Assert.That(projectFiles, Is.EqualTo(TestSolutionProjectFiles).Using(new ProjectFileEqualityComparer()));
         }
