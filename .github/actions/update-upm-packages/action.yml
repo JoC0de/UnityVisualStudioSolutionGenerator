@@ -37,15 +37,15 @@ runs:
         echo "has-changes=$($gitStatus.Length -ne 0)" >> $env:GITHUB_OUTPUT
 
     - name: Create Issue with update
-      shell: bash
+      shell: pwsh
       if: |
         steps.check-changes.outputs.has-changes == 'True'
-      run: >
+      run: |
         gh issue create --label "dependencies" --title "Update UPM package dependencies" --repo $GITHUB_REPOSITORY --body "
-        ## Diff containing updates:\n
-        ```diff\n
-        $(git diff)\n
-        ```\n
+        ## Diff containing updates:
+        ```diff
+        $(git diff)
+        ```
         "
       env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
