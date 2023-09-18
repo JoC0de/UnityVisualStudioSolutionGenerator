@@ -12,7 +12,7 @@
         "name": "JoC0de"
     },
     "dependencies": {
-        "com.unity.ide.visualstudio": "2.0.20",
+        "com.unity.ide.visualstudio": "2.0.21",
         "com.unity.settings-manager": "2.0.1"
     },
     "license": "MIT",

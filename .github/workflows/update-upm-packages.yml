@@ -1,0 +1,27 @@
+name: Update UPM packages
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "29 6 * * 0" # each Sunday at 06:29
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+
+jobs:
+  update-upm-packages:
+    name: Update UPM packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Update UPM packages files
+        uses: ./.github/actions/update-upm-packages
+        with:
+          project-root-path: src/UnityVisualStudioSolutionGenerator
+          package-json-files-to-update: |
+            Assets/package.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
