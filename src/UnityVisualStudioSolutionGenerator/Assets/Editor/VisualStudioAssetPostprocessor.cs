@@ -17,6 +17,14 @@ namespace UnityVisualStudioSolutionGenerator
     /// </summary>
     internal class VisualStudioAssetPostprocessor : AssetPostprocessor
     {
+        private static readonly TimeSpan MinDelayBetweenGeneration = TimeSpan.FromSeconds(0.5);
+
+        private static string? lastInputSolutionContent;
+
+        private static string? lastOutputSolutionContent;
+
+        private static DateTime lastSolutionGenerationTime;
+
         /// <summary>
         ///     Called by unity if it reloads the assembly.
         /// </summary>
@@ -44,6 +52,7 @@ namespace UnityVisualStudioSolutionGenerator
             var newProjects = GenerateNewProjects(allProjects, solutionFile.SolutionDirectoryPath);
 
             SolutionFileWriter.WriteToFileSafe(solutionFile.SolutionFilePath, solutionFile.SolutionDirectoryPath, newProjects);
+            lastSolutionGenerationTime = DateTime.UtcNow;
             LogHelper.LogInformation(
                 $"Generated Visual Studio Solution in '{nameof(Initialize)}': '{solutionFile}' in {stopwatch.ElapsedMilliseconds} ms.");
         }
@@ -57,7 +66,8 @@ namespace UnityVisualStudioSolutionGenerator
         /// </remarks>
         private static void OnGeneratedCSProjectFiles()
         {
-            if (!GeneratorSettings.IsEnabled)
+            var currentTime = DateTime.UtcNow;
+            if (!GeneratorSettings.IsEnabled || currentTime - lastSolutionGenerationTime < MinDelayBetweenGeneration)
             {
                 return;
             }
@@ -69,6 +79,7 @@ namespace UnityVisualStudioSolutionGenerator
             var newProjects = GenerateNewProjects(allProjects, solutionFile.SolutionDirectoryPath);
 
             SolutionFileWriter.WriteToFileSafe(solutionFile.SolutionFilePath, solutionFile.SolutionDirectoryPath, newProjects);
+            lastSolutionGenerationTime = currentTime;
             LogHelper.LogInformation($"Generated Visual Studio Solution: '{solutionFile}' in {stopwatch.ElapsedMilliseconds} ms.");
         }
 
@@ -90,6 +101,14 @@ namespace UnityVisualStudioSolutionGenerator
                     return RemoveGeneratedProjectsFromSolution(path, content);
                 }
 
+                if (content.Equals(lastInputSolutionContent, StringComparison.Ordinal))
+                {
+                    lastSolutionGenerationTime = DateTime.UtcNow;
+                    return lastOutputSolutionContent ??
+                           throw new InvalidOperationException(
+                               $"{nameof(lastOutputSolutionContent)} is null bug: {nameof(lastInputSolutionContent)} has a value.");
+                }
+
                 var stopwatch = Stopwatch.StartNew();
                 var solutionDirectoryPath = GetDirectoryPath(path);
                 var (allProjects, _) = SolutionFileParser.Parse(content, solutionDirectoryPath, false);
@@ -99,11 +118,14 @@ namespace UnityVisualStudioSolutionGenerator
                 }
 
                 var newProjects = GenerateNewProjects(allProjects, solutionDirectoryPath);
-                content = SolutionFileWriter.WriteToText(solutionDirectoryPath, newProjects);
+                var newContent = SolutionFileWriter.WriteToText(solutionDirectoryPath, newProjects);
 
+                lastSolutionGenerationTime = DateTime.UtcNow;
+                lastInputSolutionContent = content;
+                lastOutputSolutionContent = newContent;
                 LogHelper.LogInformation(
                     $"Generated content of Visual Studio Solution '{Path.GetFileName(path)}' in {stopwatch.ElapsedMilliseconds} ms.");
-                return content;
+                return newContent;
             }
             catch (Exception e)
             {
