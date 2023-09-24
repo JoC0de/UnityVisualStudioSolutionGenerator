@@ -2,6 +2,8 @@
 
 using System;
 using System.IO;
+using System.Linq;
+using System.Text;
 using NUnit.Framework;
 
 namespace UnityVisualStudioSolutionGenerator.Tests
@@ -116,6 +118,30 @@ EndGlobal
                 File.Delete(testProjectFilePath);
                 File.Delete(testSourceCode1FilePath);
                 File.Delete(testSourceCode2FilePath);
+            }
+        }
+
+        [Test]
+        public void TestByteOrderMaskHandling([Values] bool withByteOrderMask, [Values] bool alreadyHasNullable)
+        {
+            const string testSourceCode1FilePath = "TestSourceCode.cs";
+            var utf8Encoding = new UTF8Encoding(withByteOrderMask);
+            try
+            {
+                const string contentWithNullable = "#nullable enable\n\npublic class Test\n{\n}\n";
+                File.WriteAllText(testSourceCode1FilePath, alreadyHasNullable ? contentWithNullable : "public class Test\n{\n}\n", utf8Encoding);
+                SourceCodeFilesHandler.AddNullableToFile(testSourceCode1FilePath);
+                var expected = utf8Encoding.GetBytes(contentWithNullable);
+                if (withByteOrderMask)
+                {
+                    expected = Encoding.UTF8.GetPreamble().Concat(expected).ToArray();
+                }
+
+                Assert.That(File.ReadAllBytes(testSourceCode1FilePath), Is.EqualTo(expected));
+            }
+            finally
+            {
+                File.Delete(testSourceCode1FilePath);
             }
         }
     }

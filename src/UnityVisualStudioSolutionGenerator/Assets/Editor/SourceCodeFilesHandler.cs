@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -32,7 +33,7 @@ namespace UnityVisualStudioSolutionGenerator
             Debug.Assert(Encoding.UTF8.GetBytes("#nullable enable").SequenceEqual(EnableNullableBytes), "Wrong enableNullableBytes detected.");
 
             var (allProjects, _) = SolutionFileParser.Parse(solutionFile, false);
-            var enableNullableReadBuffer = new byte[EnableNullableBytes.Length + 2];
+            var enableNullableReadBuffer = new byte[EnableNullableBytes.Length + Utf8BomBytes.Length];
 
             // source code is small so we can read it into memory
             var fullFileReadBuffer = new MemoryStream();
@@ -41,7 +42,14 @@ namespace UnityVisualStudioSolutionGenerator
                 var originalProjectFilePath = Path.Combine(solutionFile.SolutionDirectoryPath, Path.GetFileName(projectFile.FilePath));
                 if (!File.Exists(originalProjectFilePath))
                 {
-                    LogHelper.LogWarning($"Can't find original (Unity) .csproj file at: '{originalProjectFilePath}'.");
+                    var generatedProjectFileParser = new ProjectFileParser(projectFile.FilePath);
+                    var assemblyDefinitionContent =
+                        JsonUtility.FromJson<AssemblyDefinitionContent>(File.ReadAllText(generatedProjectFileParser.AssemblyDefinitionFilePath));
+                    originalProjectFilePath = Path.Combine(solutionFile.SolutionDirectoryPath, $"{assemblyDefinitionContent.name}.csproj");
+                    if (!File.Exists(originalProjectFilePath))
+                    {
+                        LogHelper.LogWarning($"Can't find original (Unity) .csproj file at: '{originalProjectFilePath}'.");
+                    }
                 }
 
                 var projectFileParser = new ProjectFileParser(originalProjectFilePath);
@@ -58,7 +66,7 @@ namespace UnityVisualStudioSolutionGenerator
         /// <param name="sourceCodeFile">The path to the file to add nullable setting to, if it doesn't already has it.</param>
         public static void AddNullableToFile(string sourceCodeFile)
         {
-            AddNullableToFile(sourceCodeFile, new byte[EnableNullableBytes.Length + 2], new MemoryStream());
+            AddNullableToFile(sourceCodeFile, new byte[EnableNullableBytes.Length + Utf8BomBytes.Length], new MemoryStream());
         }
 
         private static void AddNullableToFile(string sourceCodeFile, byte[] enableNullableReadBuffer, MemoryStream fullFileReadBuffer)
@@ -69,7 +77,7 @@ namespace UnityVisualStudioSolutionGenerator
                 var readCount = fileStream.Read(enableNullableReadBuffer);
                 var readBytes = enableNullableReadBuffer.AsSpan(0, readCount);
                 var readBytesWithoutBom = readBytes;
-                var hasUtf8Bom = readBytes.SequenceEqual(Utf8BomBytes);
+                var hasUtf8Bom = readBytes.StartsWith(Utf8BomBytes);
                 if (hasUtf8Bom)
                 {
                     readBytesWithoutBom = readBytes[Utf8BomBytes.Length..];
@@ -87,7 +95,7 @@ namespace UnityVisualStudioSolutionGenerator
                     fullFileReadBuffer.Capacity = (int)fileStream.Length;
                 }
 
-                fullFileReadBuffer.Write(readBytes);
+                fullFileReadBuffer.Write(readBytesWithoutBom);
                 fileStream.CopyTo(fullFileReadBuffer);
 
                 var newLineBytes = DetectNewLineBytes(fullFileReadBuffer);
@@ -95,17 +103,24 @@ namespace UnityVisualStudioSolutionGenerator
 
                 // reset to start -> write enable nullable -> rest of file
                 fileStream.Position = 0;
+
+                if (hasUtf8Bom)
+                {
+                    fileStream.Write(Utf8BomBytes);
+                }
+
                 fileStream.Write(EnableNullableBytes);
-                var firstCharWasNewline = readBytes.StartsWith(newLineBytes);
+                var firstCharWasNewline = readBytesWithoutBom.StartsWith(newLineBytes);
                 if (!firstCharWasNewline)
                 {
                     fileStream.Write(newLineBytes);
                 }
 
-                var secondCharWasNewLine = readBytes.IsEmpty ||
+                var secondCharWasNewLine = readBytesWithoutBom.IsEmpty ||
                                            firstCharWasNewline &&
-                                           (readBytes[Math.Min(newLineBytes.Length, readBytes.Length)..].StartsWith(newLineBytes) ||
-                                            readBytes.Length == newLineBytes.Length);
+                                           (readBytesWithoutBom[Math.Min(newLineBytes.Length, readBytesWithoutBom.Length)..]
+                                                .StartsWith(newLineBytes) ||
+                                            readBytesWithoutBom.Length == newLineBytes.Length);
                 if (!secondCharWasNewLine)
                 {
                     fileStream.Write(newLineBytes);
@@ -142,6 +157,20 @@ namespace UnityVisualStudioSolutionGenerator
 
                 previous = readByte;
             }
+        }
+
+        [SuppressMessage("ReSharper", "ClassNeverInstantiated.Local", Justification = "Instantiated by json-serializer.")]
+        private sealed class AssemblyDefinitionContent
+        {
+            [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Local", Justification = "Required by serializer.")]
+            [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Required by serializer.")]
+            [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "Required by serializer.")]
+            [SuppressMessage(
+                "StyleCop.CSharp.NamingRules",
+                "SA1307:Accessible fields should begin with upper-case letter",
+                Justification = "Required by serializer.")]
+            [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "Required by serializer.")]
+            public string name = string.Empty;
         }
     }
 }

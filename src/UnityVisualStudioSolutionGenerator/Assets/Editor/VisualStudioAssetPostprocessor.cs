@@ -26,6 +26,16 @@ namespace UnityVisualStudioSolutionGenerator
         private static DateTime lastSolutionGenerationTime;
 
         /// <summary>
+        ///     Clears the cached solution content so the next time the solution is generated.
+        /// </summary>
+        public static void MarkAsChanged()
+        {
+            lastSolutionGenerationTime = DateTime.MinValue;
+            lastInputSolutionContent = null;
+            lastOutputSolutionContent = null;
+        }
+
+        /// <summary>
         ///     Called by unity if it reloads the assembly.
         /// </summary>
         [InitializeOnLoadMethod]
@@ -39,12 +49,16 @@ namespace UnityVisualStudioSolutionGenerator
 
             var stopwatch = Stopwatch.StartNew();
             var (allProjects, sourceContainsDuplicateProjects) = SolutionFileParser.Parse(solutionFile, false);
-            if (!sourceContainsDuplicateProjects)
+            const string isSolutionGeneratedKey = "UnityVisualStudioSolutionGenerator.IsSolutionGenerated";
+            var isSolutionGenerated = SessionState.GetBool(isSolutionGeneratedKey, false);
+            if (!sourceContainsDuplicateProjects || isSolutionGenerated)
             {
                 // if we don't call 'GenerateNewProjects' we need to ensure that all SourceCodeFileWatcher's are running
                 ProjectSourceCodeWatcherManager.Initialize(allProjects);
                 return;
             }
+
+            SessionState.SetBool(isSolutionGeneratedKey, true);
 
             // Sometimes 'OnGeneratedCSProjectFiles' is not called when the reload order is wrong so we regenerate it here.
             // We detect this by checking if Unity generated the .sln and skipped all events like 'OnGeneratedCSProjectFiles'
