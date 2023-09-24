@@ -2,6 +2,8 @@
 
 using System;
 using System.IO;
+using System.Linq;
+using System.Text;
 using NUnit.Framework;
 
 namespace UnityVisualStudioSolutionGenerator.Tests
@@ -49,6 +51,7 @@ EndGlobal
         [TestCase("#nullable enable\n", "#nullable enable\n")]
         [TestCase("#nullable enable\r\n", "#nullable enable\r\n")]
         [TestCase("#nullable enable\n\npublic class Test\n{\n}\n", "#nullable enable\n\npublic class Test\n{\n}\n")]
+        [TestCase("public class Test\n{\n}\n", "#nullable enable\n\npublic class Test\n{\n}\n")]
         public void SourceCodeFilesHandlerSimpleTest(string testSourceCode, string expectedSourceCode)
         {
             if (!testSourceCode.Contains('\n', StringComparison.Ordinal))
@@ -116,6 +119,30 @@ EndGlobal
                 File.Delete(testProjectFilePath);
                 File.Delete(testSourceCode1FilePath);
                 File.Delete(testSourceCode2FilePath);
+            }
+        }
+
+        [Test]
+        public void TestByteOrderMaskHandling([Values] bool withBom, [Values] bool alreadyHasNullable)
+        {
+            const string testSourceCode1FilePath = "TestSourceCode.cs";
+            var utf8Encoding = new UTF8Encoding(withBom);
+            try
+            {
+                const string contentWithNullable = "#nullable enable\n\npublic class Test\n{\n}\n";
+                File.WriteAllText(testSourceCode1FilePath, alreadyHasNullable ? contentWithNullable : "public class Test\n{\n}\n", utf8Encoding);
+                SourceCodeFilesHandler.AddNullableToFile(testSourceCode1FilePath);
+                var expected = utf8Encoding.GetBytes(contentWithNullable);
+                if (withBom)
+                {
+                    expected = Encoding.UTF8.GetPreamble().Concat(expected).ToArray();
+                }
+
+                Assert.That(File.ReadAllBytes(testSourceCode1FilePath), Is.EqualTo(expected));
+            }
+            finally
+            {
+                File.Delete(testSourceCode1FilePath);
             }
         }
     }

@@ -31,13 +31,33 @@ namespace UnityVisualStudioSolutionGenerator
         }
 
         /// <summary>
+        ///     Regenerates the Visual Studio solution file and the C# project files.
+        /// </summary>
+        [MenuItem("Visual Studio/Generate Solution", priority = 1)]
+        public static void SyncSolution()
+        {
+            VisualStudioAssetPostprocessor.MarkAsChanged();
+            CodeEditor.CurrentEditor.SyncAll();
+        }
+
+        /// <summary>
+        ///     Returns whether or not the <see cref="SyncSolution" /> menu item should be enabled.
+        /// </summary>
+        /// <returns>True if the menu item should be enabled, False otherwise.</returns>
+        [MenuItem("Visual Studio/Generate Solution", true)]
+        public static bool SyncSolutionEnabled()
+        {
+            return GeneratorSettings.IsSolutionGeneratorEnabled();
+        }
+
+        /// <summary>
         ///     Regenerates the Visual Studio solution file and the C# project files as SDK-style projects.
         /// </summary>
-        [MenuItem("Visual Studio/Generate Solution (Sdk-Style)", priority = 1)]
+        [MenuItem("Visual Studio/Generate Solution (Sdk-Style)", priority = 2)]
         public static void SyncSolutionSdkStyle()
         {
             GeneratorSettings.GenerateSdkStyleProjects = true;
-            CodeEditor.CurrentEditor.SyncAll();
+            SyncSolution();
         }
 
         /// <summary>
@@ -53,11 +73,11 @@ namespace UnityVisualStudioSolutionGenerator
         /// <summary>
         ///     Regenerates the Visual Studio solution file and the C# project files as Legacy-style projects.
         /// </summary>
-        [MenuItem("Visual Studio/Generate Solution (Legacy-Style)", priority = 2)]
+        [MenuItem("Visual Studio/Generate Solution (Legacy-Style)", priority = 3)]
         public static void SyncSolutionLegacyStyle()
         {
             GeneratorSettings.GenerateSdkStyleProjects = false;
-            CodeEditor.CurrentEditor.SyncAll();
+            SyncSolution();
         }
 
         /// <summary>
@@ -73,7 +93,7 @@ namespace UnityVisualStudioSolutionGenerator
         /// <summary>
         ///     Checks all '.cs' files to contain '#nullable enable' at the start.
         /// </summary>
-        [MenuItem("Visual Studio/Apply enable nullable to all files", priority = 3)]
+        [MenuItem("Visual Studio/Apply enable nullable to all files", priority = 4)]
         public static void EnableNullableOnAllFiles()
         {
             SourceCodeFilesHandler.EnableNullableOnAllFiles(SolutionFile.CurrentProjectSolution);
@@ -92,7 +112,7 @@ namespace UnityVisualStudioSolutionGenerator
         /// <summary>
         ///     Opens the solution generation preferences page.
         /// </summary>
-        [MenuItem("Visual Studio/Preferences", priority = 4)]
+        [MenuItem("Visual Studio/Preferences", priority = 5)]
         public static void OpenPreferences()
         {
             SettingsService.OpenProjectSettings(GeneratorSettingsProvider.PreferencesPath);
