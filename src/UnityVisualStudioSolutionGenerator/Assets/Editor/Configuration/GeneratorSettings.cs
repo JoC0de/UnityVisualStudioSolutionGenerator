@@ -40,6 +40,18 @@ namespace UnityVisualStudioSolutionGenerator.Configuration
             false);
 
         /// <summary>
+        ///     Gets a list of visual studio solutions of witch all projects are included into the generated visual studio solution.
+        /// </summary>
+        public static IList<string> AdditionalIncludedSolutions => AdditionalIncludedSolutionsSetting.value;
+
+        /// <summary>
+        ///     Gets the setting that stores the <see cref="AdditionalIncludedSolutions" /> value.
+        /// </summary>
+        public static GeneratorSettingsValue<List<string>> AdditionalIncludedSolutionsSetting { get; } = new(
+            $"general.{nameof(AdditionalIncludedSolutions)}",
+            new List<string>());
+
+        /// <summary>
         ///     Gets or sets a value indicating whether this generator is enabled.
         ///     If disabled Unity will use the 'normal' solution generator.
         /// </summary>

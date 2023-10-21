@@ -49,16 +49,18 @@ namespace UnityVisualStudioSolutionGenerator
 
             var stopwatch = Stopwatch.StartNew();
             var (allProjects, sourceContainsDuplicateProjects) = SolutionFileParser.Parse(solutionFile, false);
-            const string isSolutionGeneratedKey = "UnityVisualStudioSolutionGenerator.IsSolutionGenerated";
-            var isSolutionGenerated = SessionState.GetBool(isSolutionGeneratedKey, false);
-            if (!sourceContainsDuplicateProjects || isSolutionGenerated)
+            const string lastUsedPlatformKey = "UnityVisualStudioSolutionGenerator.LastUsedPlatform";
+            var lastUsedPlatform = (BuildTarget)SessionState.GetInt(lastUsedPlatformKey, (int)BuildTarget.NoTarget);
+            var activeBuildTarget = EditorUserBuildSettings.activeBuildTarget;
+            if (!sourceContainsDuplicateProjects || lastUsedPlatform == activeBuildTarget)
             {
-                // if we don't call 'GenerateNewProjects' we need to ensure that all SourceCodeFileWatcher's are running
+                // no need to regenerate the .csproj but
+                // as we don't call 'GenerateNewProjects' we need to ensure that all SourceCodeFileWatcher's are running
                 ProjectSourceCodeWatcherManager.Initialize(allProjects);
                 return;
             }
 
-            SessionState.SetBool(isSolutionGeneratedKey, true);
+            SessionState.SetInt(lastUsedPlatformKey, (int)activeBuildTarget);
 
             // Sometimes 'OnGeneratedCSProjectFiles' is not called when the reload order is wrong so we regenerate it here.
             // We detect this by checking if Unity generated the .sln and skipped all events like 'OnGeneratedCSProjectFiles'
@@ -176,6 +178,31 @@ namespace UnityVisualStudioSolutionGenerator
                 ReSharperProjectSettingsGenerator.WriteSettingsIfMissing(newProjectFilePath);
                 ProjectSourceCodeWatcherManager.AddSourceCodeWatcherForProject(GetDirectoryPath(newProjectFilePath));
                 newProjects.Add(new ProjectFile(newProjectFilePath, project.Id));
+            }
+
+            foreach (var additionalIncludedSolution in GeneratorSettings.AdditionalIncludedSolutions)
+            {
+                if (!File.Exists(additionalIncludedSolution))
+                {
+                    LogHelper.LogInformation(
+                        $"The additional solution file '{additionalIncludedSolution}' doesn't exists so we skip it from the solution.");
+                    continue;
+                }
+
+                var (additionalProjects, _) = SolutionFileParser.Parse(
+                    File.ReadAllText(additionalIncludedSolution),
+                    GetDirectoryPath(additionalIncludedSolution),
+                    false);
+                foreach (var additionalProject in additionalProjects)
+                {
+                    if (newProjects.Contains(additionalProject))
+                    {
+                        continue;
+                    }
+
+                    ProjectSourceCodeWatcherManager.AddSourceCodeWatcherForProject(GetDirectoryPath(additionalProject.FilePath));
+                    newProjects.Add(additionalProject);
+                }
             }
 
             return newProjects;
