@@ -52,7 +52,7 @@ namespace UnityVisualStudioSolutionGenerator
             const string lastUsedPlatformKey = "UnityVisualStudioSolutionGenerator.LastUsedPlatform";
             var lastUsedPlatform = (BuildTarget)SessionState.GetInt(lastUsedPlatformKey, (int)BuildTarget.NoTarget);
             var activeBuildTarget = EditorUserBuildSettings.activeBuildTarget;
-            if (!sourceContainsDuplicateProjects || lastUsedPlatform == activeBuildTarget)
+            if (!sourceContainsDuplicateProjects && lastUsedPlatform == activeBuildTarget)
             {
                 // no need to regenerate the .csproj but
                 // as we don't call 'GenerateNewProjects' we need to ensure that all SourceCodeFileWatcher's are running
