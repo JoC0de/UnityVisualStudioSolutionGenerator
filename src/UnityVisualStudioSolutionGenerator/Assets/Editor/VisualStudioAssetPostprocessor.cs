@@ -173,6 +173,13 @@ namespace UnityVisualStudioSolutionGenerator
                     continue;
                 }
 
+                if (!File.Exists(generator.AssemblyDefinitionFilePath))
+                {
+                    LogHelper.LogInformation(
+                        $"The '.asmdef' file '{generator.AssemblyDefinitionFilePath}' doesn't exists so we exclude the project from the solution.");
+                    continue;
+                }
+
                 var newProjectFilePath = generator.WriteProjectFile(solutionDirectoryPath);
 
                 ReSharperProjectSettingsGenerator.WriteSettingsIfMissing(newProjectFilePath);

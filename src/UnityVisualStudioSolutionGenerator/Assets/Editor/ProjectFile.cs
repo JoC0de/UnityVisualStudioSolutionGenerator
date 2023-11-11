@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.IO;
 
 namespace UnityVisualStudioSolutionGenerator
 {
@@ -18,6 +19,7 @@ namespace UnityVisualStudioSolutionGenerator
         {
             FilePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
             Id = id ?? throw new ArgumentNullException(nameof(id));
+            ProjectName = Path.GetFileNameWithoutExtension(filePath);
         }
 
         /// <summary>
@@ -29,6 +31,11 @@ namespace UnityVisualStudioSolutionGenerator
         ///     Gets the ID of the project file.
         /// </summary>
         public string Id { get; }
+
+        /// <summary>
+        ///     Gets the project name witch is the name of the project file without its extension.
+        /// </summary>
+        public string ProjectName { get; }
 
         /// <inheritdoc />
         public override bool Equals(object? obj)
@@ -50,8 +57,8 @@ namespace UnityVisualStudioSolutionGenerator
 
         private bool Equals(ProjectFile other)
         {
-            // we need to use the FilePath as an alternative so we detect duplicate entries inside .sln
-            return Id == other.Id || FilePath == other.FilePath;
+            // we need to use the ProjectName as an alternative so we detect duplicate entries inside .sln
+            return Id == other.Id || ProjectName == other.ProjectName;
         }
     }
 }
