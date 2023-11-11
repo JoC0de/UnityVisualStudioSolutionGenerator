@@ -52,7 +52,7 @@ namespace UnityVisualStudioSolutionGenerator
             const string lastUsedPlatformKey = "UnityVisualStudioSolutionGenerator.LastUsedPlatform";
             var lastUsedPlatform = (BuildTarget)SessionState.GetInt(lastUsedPlatformKey, (int)BuildTarget.NoTarget);
             var activeBuildTarget = EditorUserBuildSettings.activeBuildTarget;
-            if (!sourceContainsDuplicateProjects || lastUsedPlatform == activeBuildTarget)
+            if (!sourceContainsDuplicateProjects && lastUsedPlatform == activeBuildTarget)
             {
                 // no need to regenerate the .csproj but
                 // as we don't call 'GenerateNewProjects' we need to ensure that all SourceCodeFileWatcher's are running
@@ -170,6 +170,13 @@ namespace UnityVisualStudioSolutionGenerator
                     LogHelper.LogVerbose(
                         $"The project '{Path.GetFileNameWithoutExtension(project.FilePath)}' is a Unity Package so we don't change the '.csproj' file.");
                     newProjects.Add(project);
+                    continue;
+                }
+
+                if (!File.Exists(generator.AssemblyDefinitionFilePath))
+                {
+                    LogHelper.LogInformation(
+                        $"The '.asmdef' file '{generator.AssemblyDefinitionFilePath}' doesn't exists so we exclude the project from the solution.");
                     continue;
                 }
 

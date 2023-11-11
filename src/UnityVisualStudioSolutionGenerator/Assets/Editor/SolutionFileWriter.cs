@@ -72,7 +72,7 @@ namespace UnityVisualStudioSolutionGenerator
 
             foreach (var project in allProjects)
             {
-                var projectName = Path.GetFileNameWithoutExtension(project.FilePath);
+                var projectName = project.ProjectName;
                 var relativeProjectFilePath = Path.GetRelativePath(solutionDirectoryPath, project.FilePath);
                 writer.WriteLine(
                     "Project(\"{{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}}\") = \"{0}\", \"{1}\", \"{2}\"",
