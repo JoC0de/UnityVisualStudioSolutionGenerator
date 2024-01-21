@@ -52,6 +52,18 @@ namespace UnityVisualStudioSolutionGenerator.Configuration
             new List<string>());
 
         /// <summary>
+        ///     Gets a list of C# project files (.csproj) that sould be included into the generated visual studio solution.
+        /// </summary>
+        public static IList<string> AdditionalIncludedProjectFiles => AdditionalIncludedProjectFilesSetting.value;
+
+        /// <summary>
+        ///     Gets the setting that stores the <see cref="AdditionalIncludedProjectFiles" /> value.
+        /// </summary>
+        public static GeneratorSettingsValue<List<string>> AdditionalIncludedProjectFilesSetting { get; } = new(
+            $"general.{nameof(AdditionalIncludedProjectFiles)}",
+            new List<string>());
+
+        /// <summary>
         ///     Gets or sets a value indicating whether this generator is enabled.
         ///     If disabled Unity will use the 'normal' solution generator.
         /// </summary>
