@@ -23,6 +23,7 @@ namespace UnityVisualStudioSolutionGenerator.Configuration
         /// <returns>The settings provider / the class used to generate the UI to change the settings.</returns>
         [SettingsProvider]
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Called by Unity")]
+        [SuppressMessage("Performance", "CA1859:Use concrete types when possible for improved performance", Justification = "Return type needed becaus of Unity.")]
         private static SettingsProvider CreateSettingsProvider()
         {
             return new UserSettingsProvider(
