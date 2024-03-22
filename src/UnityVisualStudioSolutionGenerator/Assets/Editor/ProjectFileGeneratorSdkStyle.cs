@@ -13,6 +13,9 @@ namespace UnityVisualStudioSolutionGenerator
     /// </summary>
     public class ProjectFileGeneratorSdkStyle : ProjectFileGeneratorBase
     {
+        private const string GeneratedByElementName = "GeneratedBy";
+        private const string GeneratorName = "UnityVisualStudioSolutionGenerator";
+
         /// <inheritdoc cref="ProjectFileGeneratorBase(string)" />
         public ProjectFileGeneratorSdkStyle(string filePath)
             : base(filePath)
@@ -27,6 +30,7 @@ namespace UnityVisualStudioSolutionGenerator
             wrappedWriter.WriteStartElement("Project");
 
             wrappedWriter.WriteStartElement("PropertyGroup");
+            wrappedWriter.WriteElementString(GeneratedByElementName, GeneratorName);
             wrappedWriter.WriteElementString("OutputPath", Path.Combine(solutionDirectoryPath, "Temp", "Bin", "$(Configuration)", ProjectName));
             wrappedWriter.WriteElementString("BaseIntermediateOutputPath", Path.Combine(solutionDirectoryPath, "obj", "Sdk", ProjectName));
             wrappedWriter.WriteElementString("IsUnityProject", "true");
@@ -34,6 +38,7 @@ namespace UnityVisualStudioSolutionGenerator
 
             var relativeSubProjectDirectories = FindSubProjectFolders(outputFileDirectoryPath);
             wrappedWriter.WriteStartElement("PropertyGroup");
+            wrappedWriter.WriteElementString(GeneratedByElementName, GeneratorName);
             var fileExcludedPatterns = string.Join(
                 ';',
                 GeneratorSettings.SdkExcludedFilePatterns.Where(pattern => !string.IsNullOrWhiteSpace(pattern))
@@ -58,6 +63,12 @@ namespace UnityVisualStudioSolutionGenerator
             // copy property groups elements from input
             foreach (var propertyGroup in ProjectElement.Elements(XmlNamespace + "PropertyGroup"))
             {
+                if (propertyGroup.Element(XmlNamespace + GeneratedByElementName)?.Value == GeneratorName)
+                {
+                    // prevent adding property groups twice
+                    continue;
+                }
+
                 propertyGroup.Element(XmlNamespace + "OutputPath")?.Remove();
                 propertyGroup.Element(XmlNamespace + "ProductVersion")?.Remove();
                 propertyGroup.Element(XmlNamespace + "SchemaVersion")?.Remove();

@@ -11,41 +11,14 @@ param (
     $ProjectPath,
 
     [Parameter(Mandatory = $true,
-        HelpMessage = "List of pattern used to determine packages that can't be updated.")]
-    [string[]]
-    $ExcludedPackagePatterns,
-
-    [Parameter(Mandatory = $true,
         HelpMessage = 'List of package.json files that should also be updated with the new version numbers.')]
     [string[]]
     $PackageJsonFilesToUpdate
 )
 
 $ErrorActionPreference = 'Stop'
-$UnityPackageRepositoryBaseUrl = 'https://packages.unity.com'
-
-function Test-Any {
-    param (
-        [Parameter(Mandatory = $true)]
-        $EvaluateCondition,
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        $ObjectToTest
-    )
-    begin {
-        $any = $false
-    }
-    process {
-        if (-not $any -and (& $EvaluateCondition $ObjectToTest)) {
-            $any = $true
-        }
-    }
-    end {
-        $any
-    }
-}
 
 $ProjectPath = $ProjectPath.Trim()
-$ExcludedPackagePatterns = $ExcludedPackagePatterns | ForEach-Object { $_.Trim() }
 $PackageJsonFilesToUpdate = $PackageJsonFilesToUpdate | ForEach-Object { $_.Trim() }
 $oldLocation = Get-Location
 try {
@@ -55,18 +28,29 @@ try {
         throw "One of the provided package.json files doesn't exists: ['$($PackageJsonFilesToUpdate -join "'; '")']"
     }
 
-    $manifestObject = Get-Content -Path 'Packages\manifest.json' -Encoding utf8 | ConvertFrom-Json
+    $manifestObject = Get-Content -Path 'Packages\manifest.json' -Encoding utf8 | ConvertFrom-Json -Depth 10
+    $packagesLockObject = Get-Content -Path "Packages\packages-lock.json" -Encoding utf8 | ConvertFrom-Json -Depth 10
     $availableUpdates = New-Object Collections.Generic.List[PsObject]
     foreach ($dependency in $manifestObject.dependencies.PsObject.Properties) {
         $packageName = $dependency.Name
         $currentVersion = $dependency.Value
-        if ($ExcludedPackagePatterns | Test-Any { $_ -like $packageName }) {
+        $packageLockData = $packagesLockObject.dependencies.PsObject.Properties[$packageName].Value
+        if ($packageLockData.source -ne 'registry') {
             continue
         }
 
-        $repositoryBaseUrl = $UnityPackageRepositoryBaseUrl
-        $packageMetadata = Invoke-WebRequest -Uri "$repositoryBaseUrl/$packageName" | ConvertFrom-Json
+        $repositoryBaseUrl = $packageLockData.url
+        $packageMetadata = Invoke-WebRequest -Uri "$repositoryBaseUrl/$packageName" | ConvertFrom-Json -Depth 10
         $latestVersion = $packageMetadata.'dist-tags'.latest
+        if ($currentVersion.Contains('-')) {
+            # current is pre-release -> allow pre-release
+            $latestVersion = $packageMetadata.'dist-tags'.latest
+        }
+        else {
+            $latestVersion = ($packageMetadata.versions.PsObject.Properties | Where-Object { -not $_.Name.Contains('-') } |
+                ForEach-Object { [System.Version]::Parse($_.Name) } | Sort-Object -Descending | Select-Object -First 1).ToString()
+        }
+
         if ([System.String]::IsNullOrEmpty($latestVersion)) {
             throw "Failed to get latest version number for package: '$packageName'. Received the following from the registry: '$repositoryBaseUrl': $packageMetadata"
         }
@@ -88,7 +72,7 @@ try {
     }
 
     Write-Host "Update Packages/manifest.json of Unity project at: '$ProjectPath'"
-    ConvertTo-Json -InputObject $manifestObject | Set-Content -Path 'Packages\manifest.json' -Encoding utf8
+    ConvertTo-Json -InputObject $manifestObject -Depth 10  | Set-Content -Path 'Packages\manifest.json' -Encoding utf8
 
     foreach ($packageJsonFile in $PackageJsonFilesToUpdate) {
         $packageJsonContent = Get-Content -Path $packageJsonFile -Encoding utf8

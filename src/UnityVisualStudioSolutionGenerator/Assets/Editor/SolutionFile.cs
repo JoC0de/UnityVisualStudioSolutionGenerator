@@ -18,6 +18,11 @@ namespace UnityVisualStudioSolutionGenerator
             CurrentProjectSolution = new SolutionFile(solutionDirectoryPath, solutionFilePath);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SolutionFile"/> class.
+        /// </summary>
+        /// <param name="solutionDirectoryPath">The directory that contains the .sln file.</param>
+        /// <param name="solutionFilePath">The full path of the .sln file.</param>
         public SolutionFile(string solutionDirectoryPath, string solutionFilePath)
         {
             SolutionDirectoryPath = solutionDirectoryPath ?? throw new ArgumentNullException(nameof(solutionDirectoryPath));

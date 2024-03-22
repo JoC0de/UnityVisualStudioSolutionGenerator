@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "com.github-joc0de.visual-studio-solution-generator": "file:../../../UnityVisualStudioSolutionGenerator/Assets"
+    "com.github-joc0de.visual-studio-solution-generator": "file:../../../UnityVisualStudioSolutionGenerator/Assets",
+    "com.unity.modules.accessibility": "1.0.0"
   }
 }
