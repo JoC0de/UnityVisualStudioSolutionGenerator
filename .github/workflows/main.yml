@@ -2,7 +2,9 @@ name: Build and Test
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - "main"
+      - "dependabot/github_actions/*"
     tags: ["v*"]
   pull_request_target:
     branches: ["main"]
@@ -17,6 +19,9 @@ jobs:
   testOnLinux:
     name: Test on Linux
     runs-on: ubuntu-latest
+    if: |
+      github.event_name != 'pull_request_target' ||
+      !startsWith(github.head_ref, 'dependabot/github_actions/')
     steps:
       - name: Checkout action file
         uses: Bhacaz/checkout-files@v2
