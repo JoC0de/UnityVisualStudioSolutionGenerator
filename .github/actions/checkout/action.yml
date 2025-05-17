@@ -3,6 +3,10 @@ description: Checkout the source code. For pull requests it checks out the merge
 runs:
   using: composite
   steps:
+    - name: clear .git from previous checkout
+      shell: bash
+      run: rm -r .git
+
     - name: Checkout normal
       uses: actions/checkout@v4
       if: github.event_name != 'pull_request_target'
@@ -21,7 +25,7 @@ runs:
     - name: Get changed files in the .github folder
       if: github.event_name == 'pull_request_target'
       id: changedWorkflowFiles
-      uses: tj-actions/changed-files@v35
+      uses: tj-actions/changed-files@v46
       with:
         files: |
           .github/**
