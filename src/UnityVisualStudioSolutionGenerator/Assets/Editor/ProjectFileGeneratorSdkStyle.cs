@@ -69,6 +69,11 @@ namespace UnityVisualStudioSolutionGenerator
                     continue;
                 }
 
+                // Unity's SDK style generator, used when VS Code is the active editor, has this settings we need to remove
+                propertyGroup.Element(XmlNamespace + "EnableDefaultItems")?.Remove();
+                propertyGroup.Element(XmlNamespace + "BaseIntermediateOutputPath")?.Remove();
+                propertyGroup.Element(XmlNamespace + "IntermediateOutputPath")?.Remove();
+
                 propertyGroup.Element(XmlNamespace + "OutputPath")?.Remove();
                 propertyGroup.Element(XmlNamespace + "ProductVersion")?.Remove();
                 propertyGroup.Element(XmlNamespace + "SchemaVersion")?.Remove();
