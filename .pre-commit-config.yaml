@@ -2,19 +2,16 @@
 # See https://pre-commit.com/hooks.html for more hooks
 exclude: "^.git$|/ProjectSettings/Packages/"
 repos:
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.2
+  - repo: https://github.com/JoC0de/pre-commit-prettier
+    rev: v3.5.3
     hooks:
-      - id: "prettier"
+      - id: prettier
         additional_dependencies:
-          - prettier@v3.0.2
-          - "@prettier/plugin-xml@3.2.0"
-          - prettier-plugin-ini@v1.1.0
+          - prettier@3.5.3
+          - "@prettier/plugin-xml@3.4.1"
+          - "prettier-plugin-ini@1.3.0"
         args:
-          # change back to --plugin=@prettier/plugin-xml and --plugin=prettier-plugin-ini if https://github.com/prettier/prettier/issues/15141 is fixed
-          # or try using .prettierrc.cjs see: https://github.com/scverse/scverse.github.io/pull/109/files
-          - --plugin=file://%NODE_VIRTUAL_ENV%/Scripts/node_modules/@prettier/plugin-xml/src/plugin.js
-          - --plugin=file://%NODE_VIRTUAL_ENV%/Scripts/node_modules/prettier-plugin-ini/dist/plugin.js
+          - --plugin=prettier-plugin-ini
         files: Directory\.Build\.props$|(\.(json|xml|html|config|csproj|DotSettings|yaml|yml|js|md|xrml|xaml|css|editorconfig)$)
   - repo: local
     hooks:
@@ -38,9 +35,9 @@ repos:
         files: \.cs$
         pass_filenames: true
         require_serial: true
-        stages: [commit, merge-commit]
+        stages: [pre-commit, pre-merge-commit]
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
         exclude: \.(pdf|meta|prefab|shader|controller|asset|cginc|mat|unity|anim|shadergraph)$
