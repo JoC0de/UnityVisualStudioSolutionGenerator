@@ -24,7 +24,7 @@ jobs:
       !startsWith(github.head_ref, 'dependabot/github_actions/')
     steps:
       - name: Checkout only action file
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           sparse-checkout: |
             .github/actions/checkout/action.yml
