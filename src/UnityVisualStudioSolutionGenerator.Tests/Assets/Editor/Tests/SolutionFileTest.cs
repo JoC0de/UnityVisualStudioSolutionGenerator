@@ -56,7 +56,8 @@ EndGlobal
         [Test]
         public void ParseSolutionTest()
         {
-            var (projectFiles, _) = SolutionFileParser.Parse(TestSolutionContent, SolutionDirectoryPath, false);
+            var solutionFile = new SolutionFile(SolutionDirectoryPath, "UnityVisualStudioSolutionGenerator.Tests.sln");
+            var (projectFiles, _) = SolutionFileParser.Parse(TestSolutionContent, solutionFile, false);
 
             Assert.That(projectFiles, Is.EqualTo(TestSolutionProjectFiles).Using(new ProjectFileEqualityComparer()));
         }
@@ -64,7 +65,8 @@ EndGlobal
         [Test]
         public void WriteSolutionTest()
         {
-            var generatedSolutionContent = SolutionFileWriter.WriteToText(SolutionDirectoryPath, TestSolutionProjectFiles);
+            var solutionFile = new SolutionFile(SolutionDirectoryPath, "UnityVisualStudioSolutionGenerator.Tests.sln");
+            var generatedSolutionContent = SolutionFileWriter.WriteToText(solutionFile, TestSolutionProjectFiles);
 
             Assert.That(generatedSolutionContent, Is.EqualTo(TestSolutionContent));
         }

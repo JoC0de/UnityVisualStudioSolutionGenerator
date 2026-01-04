@@ -11,102 +11,88 @@ using System.Text;
 namespace UnityVisualStudioSolutionGenerator
 {
     /// <summary>
-    ///     Writes a Visual Studio solution file.
+    ///     Provides methods for writing Visual Studio solution files (.sln or .slnx) to disk or as text.
     /// </summary>
     public static class SolutionFileWriter
     {
         /// <summary>
-        ///     Generates a Visual Studio solution file and write it to a string.
+        ///     The Windows standard new line string (<c>\r\n</c>).
         /// </summary>
-        /// <param name="solutionDirectoryPath">The absolute path of the solution directory.</param>
-        /// <param name="allProjects">All projects that should be included inside the solution.</param>
-        /// <returns>The content of the generated solution as plain text.</returns>
-        public static string WriteToText(string solutionDirectoryPath, IReadOnlyList<ProjectFile> allProjects)
+        internal const string WindowsNewLine = "\r\n";
+
+        /// <summary>
+        ///     Generates a Visual Studio solution file content as a string.
+        /// </summary>
+        /// <param name="solutionFile">The solution file information.</param>
+        /// <param name="newProjects">All projects that should be included inside the solution.</param>
+        /// <returns>The generated solution file content as a string.</returns>
+        internal static string WriteToText(SolutionFile solutionFile, IReadOnlyList<ProjectFile> newProjects)
         {
-            _ = allProjects ?? throw new ArgumentNullException(nameof(allProjects));
-            using var writer = new StringWriter();
-            GenerateVisualStudioSolution(writer, solutionDirectoryPath, allProjects);
-            return writer.ToString();
+            using var stringWriter = new StringWriter();
+            WriteTo(solutionFile.IsXmlSolution, solutionFile.SolutionDirectoryPath, newProjects, stringWriter);
+
+            var result = stringWriter.ToString();
+            if (!result.EndsWith(WindowsNewLine, StringComparison.Ordinal))
+            {
+                result += WindowsNewLine;
+            }
+
+            return result;
         }
 
         /// <summary>
         ///     Generates a Visual Studio solution file and write it to a file. The file is overwritten so, we first write it to a temp file so any exceptions
         ///     while generating the file don't lead to a incomplete file.
         /// </summary>
-        /// <param name="outputFilePath">The file path to write the generated solution file.</param>
-        /// <param name="solutionDirectoryPath">The absolute path of the solution directory.</param>
+        /// <param name="solutionFile">The solution file information.</param>
         /// <param name="projectFiles">All projects that should be included inside the solution.</param>
         [SuppressMessage("Security", "CA5351", Justification = "Hash is only used for comparison.")]
-        public static void WriteToFileSafe(string outputFilePath, string solutionDirectoryPath, IReadOnlyList<ProjectFile> projectFiles)
+        internal static void WriteToFileSafe(SolutionFile solutionFile, IReadOnlyList<ProjectFile> projectFiles)
         {
             // we don't write directly to prevent exceptions
-            var tempSolutionFilePath = $"{outputFilePath}.temp";
-            WriteToFile(tempSolutionFilePath, solutionDirectoryPath, projectFiles);
+            var tempSolutionFileName = $"{solutionFile.SolutionFilePath}.temp";
+            WriteToFile(solutionFile.IsXmlSolution, tempSolutionFileName, solutionFile.SolutionDirectoryPath, projectFiles);
 
-            if (File.Exists(outputFilePath))
+            if (File.Exists(solutionFile.SolutionFilePath))
             {
                 // only write if the content has changed
                 using var md5Algorithm = MD5.Create();
-                var hashOfNew = ComputeFileHash(tempSolutionFilePath, md5Algorithm);
-                var hashOfOld = ComputeFileHash(outputFilePath, md5Algorithm);
+                var hashOfNew = ComputeFileHash(tempSolutionFileName, md5Algorithm);
+                var hashOfOld = ComputeFileHash(solutionFile.SolutionFilePath, md5Algorithm);
 
                 if (hashOfOld.SequenceEqual(hashOfNew))
                 {
                     // nothing changed -> don't overwrite original file (don't trigger reload in Visual Studio)
-                    File.Delete(tempSolutionFilePath);
+                    File.Delete(tempSolutionFileName);
                     return;
                 }
 
-                File.Delete(outputFilePath);
+                File.Delete(solutionFile.SolutionFilePath);
             }
 
-            File.Move(tempSolutionFilePath, outputFilePath);
+            File.Move(tempSolutionFileName, solutionFile.SolutionFilePath);
         }
 
-        private static void GenerateVisualStudioSolution(TextWriter writer, string solutionDirectoryPath, IReadOnlyList<ProjectFile> allProjects)
+        private static void WriteToFile(
+            bool useXmlFormat,
+            string solutionFileName,
+            string solutionDirectoryPath,
+            IReadOnlyList<ProjectFile> projectFiles)
         {
-            writer.WriteLine("Microsoft Visual Studio Solution File, Format Version 12.00");
-            writer.WriteLine("# Visual Studio Version 17");
-            writer.WriteLine("VisualStudioVersion = 17.0.32014.148");
-            writer.WriteLine("MinimumVisualStudioVersion = 10.0.40219.1");
-
-            foreach (var project in allProjects)
-            {
-                var projectName = project.ProjectName;
-                var relativeProjectFilePath = Path.GetRelativePath(solutionDirectoryPath, project.FilePath);
-                writer.WriteLine(
-                    "Project(\"{{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}}\") = \"{0}\", \"{1}\", \"{2}\"",
-                    projectName,
-                    relativeProjectFilePath,
-                    project.Id);
-                writer.WriteLine("EndProject");
-            }
-
-            writer.WriteLine("Global");
-            writer.WriteLine("\tGlobalSection(SolutionConfigurationPlatforms) = preSolution");
-            writer.WriteLine("\t\tDebug|Any CPU = Debug|Any CPU");
-            writer.WriteLine("\t\tRelease|Any CPU = Release|Any CPU");
-            writer.WriteLine("\tEndGlobalSection");
-            writer.WriteLine("\tGlobalSection(ProjectConfigurationPlatforms) = postSolution");
-            foreach (var project in allProjects)
-            {
-                writer.WriteLine("\t\t{0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU", project.Id);
-                writer.WriteLine("\t\t{0}.Debug|Any CPU.Build.0 = Debug|Any CPU", project.Id);
-                writer.WriteLine("\t\t{0}.Release|Any CPU.ActiveCfg = Release|Any CPU", project.Id);
-                writer.WriteLine("\t\t{0}.Release|Any CPU.Build.0 = Release|Any CPU", project.Id);
-            }
-
-            writer.WriteLine("\tEndGlobalSection");
-            writer.WriteLine("\tGlobalSection(SolutionProperties) = preSolution");
-            writer.WriteLine("\t\tHideSolutionNode = FALSE");
-            writer.WriteLine("\tEndGlobalSection");
-            writer.WriteLine("EndGlobal");
+            using var solutionWriter = new StreamWriter(File.Create(solutionFileName), Encoding.UTF8);
+            WriteTo(useXmlFormat, solutionDirectoryPath, projectFiles, solutionWriter);
         }
 
-        private static void WriteToFile(string outputFilePath, string solutionDirectoryPath, IReadOnlyList<ProjectFile> projectFiles)
+        private static void WriteTo(bool useXmlFormat, string solutionDirectoryPath, IReadOnlyList<ProjectFile> projectFiles, TextWriter writer)
         {
-            using var solutionWriter = new StreamWriter(File.Create(outputFilePath), Encoding.UTF8);
-            GenerateVisualStudioSolution(solutionWriter, solutionDirectoryPath, projectFiles);
+            if (useXmlFormat)
+            {
+                XmlSolutionFileWriter.WriteTo(writer, solutionDirectoryPath, projectFiles);
+            }
+            else
+            {
+                LegacySolutionFileWriter.WriteTo(writer, solutionDirectoryPath, projectFiles);
+            }
         }
 
         private static byte[] ComputeFileHash(string tempSolutionFilePath, HashAlgorithm md5Algorithm)

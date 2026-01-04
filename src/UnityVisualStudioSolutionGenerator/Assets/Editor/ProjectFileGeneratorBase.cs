@@ -107,8 +107,9 @@ namespace UnityVisualStudioSolutionGenerator
                     outputFileDirectoryPath,
                     "*.asmdef",
                     new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = true })
-                .Select(
-                    assemblyDefinitionFilePath => Path.GetRelativePath(outputFileDirectoryPath, Path.GetDirectoryName(assemblyDefinitionFilePath)))
+                .Select(assemblyDefinitionFilePath => Path.GetRelativePath(
+                    outputFileDirectoryPath,
+                    Path.GetDirectoryName(assemblyDefinitionFilePath)))
                 .Where(relativeSubProjectDirectory => !string.IsNullOrEmpty(relativeSubProjectDirectory) && relativeSubProjectDirectory != ".");
             return foldersToIgnore;
         }
@@ -132,14 +133,14 @@ namespace UnityVisualStudioSolutionGenerator
             return !string.IsNullOrWhiteSpace(value) && patterns.Exists(pattern => MatchesPattern(value!, pattern));
         }
 
-        private static bool MatchesPattern(string value, IReadOnlyList<string> pattern)
+        private static bool MatchesPattern(string value, string[] pattern)
         {
-            if (pattern.Count == 0)
+            if (pattern.Length == 0)
             {
                 return true;
             }
 
-            if (pattern.Count == 1)
+            if (pattern.Length == 1)
             {
                 // no '*'
                 return string.Equals(value, pattern[0], StringComparison.OrdinalIgnoreCase);
@@ -152,7 +153,7 @@ namespace UnityVisualStudioSolutionGenerator
             }
 
             var matchStartIndex = pattern[0].Length;
-            var lastPatternIndex = pattern.Count - 1;
+            var lastPatternIndex = pattern.Length - 1;
 
             // last pattern is a end with condition
             if (pattern[lastPatternIndex].Length != 0 &&

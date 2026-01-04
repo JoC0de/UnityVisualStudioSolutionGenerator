@@ -6,14 +6,17 @@ import time
 scriptLocation = os.path.dirname(os.path.realpath(sys.argv[0]))
 repositoryRoot = os.path.dirname(scriptLocation)
 
-solutionFiles = ["src/UnityVisualStudioSolutionGenerator.Tests/UnityVisualStudioSolutionGenerator.Tests.sln"]
+solutionFiles = [["src/UnityVisualStudioSolutionGenerator.Tests/UnityVisualStudioSolutionGenerator.Tests.sln", "src/TestProjects/RootTestProject/RootTestProject.slnx"]]
 toolsRoot = repositoryRoot
 
 subprocess.run(["dotnet", "tool", "restore"], cwd = toolsRoot, check = True)
 startTime = time.time()
 
 try:
-    for solutionFile in solutionFiles:
+    for solutionFileAlternatives in solutionFiles:
+        solutionFile = next((file for file in solutionFileAlternatives if os.path.isfile(os.path.realpath(os.path.join(repositoryRoot, file)))), None)
+        if solutionFile is None:
+           sys.exit(f"can't find the solution file in alternatives: {solutionFileAlternatives}")
         relativeSolutionFile = solutionFile
         solutionFile = os.path.realpath(os.path.join(repositoryRoot, solutionFile))
         if not os.path.isfile(solutionFile):

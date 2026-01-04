@@ -21,16 +21,6 @@ namespace UnityVisualStudioSolutionGenerator
         }
 
         /// <summary>
-        ///     Returns whether or not the <see cref="OpenSolution" /> menu item should be enabled.
-        /// </summary>
-        /// <returns>True if the menu item should be enabled, False otherwise.</returns>
-        [MenuItem("Visual Studio/Open Solution", true)]
-        public static bool OpenSolutionEnabled()
-        {
-            return GeneratorSettings.IsVisualStudioEditorEnabled();
-        }
-
-        /// <summary>
         ///     Regenerates the Visual Studio solution file and the C# project files.
         /// </summary>
         [MenuItem("Visual Studio/Generate Solution", priority = 1)]
@@ -96,7 +86,14 @@ namespace UnityVisualStudioSolutionGenerator
         [MenuItem("Visual Studio/Apply enable nullable to all files", priority = 4)]
         public static void EnableNullableOnAllFiles()
         {
-            SourceCodeFilesHandler.EnableNullableOnAllFiles(SolutionFile.CurrentProjectSolution);
+            var solutionFile = SolutionFile.CurrentProjectSolution;
+            if (solutionFile is null)
+            {
+                LogHelper.LogError($"No solution file found to apply 'nullable enable' to all files.");
+                return;
+            }
+
+            SourceCodeFilesHandler.EnableNullableOnAllFiles(solutionFile);
         }
 
         /// <summary>
