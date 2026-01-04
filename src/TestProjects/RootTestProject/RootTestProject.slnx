@@ -1,0 +1,6 @@
+﻿<Solution>
+  <Project Path="..\..\UnityVisualStudioSolutionGenerator\Assets\Editor\UnityVisualStudioSolutionGenerator.csproj" />
+  <Project Path="Assets\RootTestProject.csproj" />
+  <Project Path="Assets\Module1\RootTestProject.Module1.csproj" />
+  <Project Path="Assets\Module2\RootTestProject.Module2.csproj" />
+</Solution>

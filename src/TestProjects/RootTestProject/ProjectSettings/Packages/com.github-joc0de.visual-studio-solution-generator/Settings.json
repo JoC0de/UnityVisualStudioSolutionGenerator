@@ -47,6 +47,11 @@
                 "value": "{\"m_Value\":[]}"
             },
             {
+                "type": "System.Collections.Generic.List`1[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+                "key": "general.AdditionalIncludedProjectFiles",
+                "value": "{\"m_Value\":[]}"
+            },
+            {
                 "type": "System.Collections.Generic.List`1[[UnityVisualStudioSolutionGenerator.Configuration.PropertyGroupSetting, UnityVisualStudioSolutionGenerator, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
                 "key": "sdk-style.SdkAdditionalProperties",
                 "value": "{\"m_Value\":[{\"<Name>k__BackingField\":\"EnableNETAnalyzers\",\"<Value>k__BackingField\":\"true\"},{\"<Name>k__BackingField\":\"AnalysisLevel\",\"<Value>k__BackingField\":\"latest\"},{\"<Name>k__BackingField\":\"AnalysisMode\",\"<Value>k__BackingField\":\"AllEnabledByDefault\"}]}"

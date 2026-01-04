@@ -36,7 +36,9 @@ ExportedObj/
 *.csproj.meta
 *.unityproj
 *.sln
+*.slnx
 *.sln.meta
+*.slnx.meta
 *.suo
 *.tmp
 *.user

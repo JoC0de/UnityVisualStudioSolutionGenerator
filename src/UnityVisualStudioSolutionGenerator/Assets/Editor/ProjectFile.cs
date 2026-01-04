@@ -29,6 +29,7 @@ namespace UnityVisualStudioSolutionGenerator
 
         /// <summary>
         ///     Gets the ID of the project file.
+        ///     When using .slnx solution files we have no 'Id' it will always be empty string.
         /// </summary>
         public string Id { get; }
 
@@ -46,17 +47,33 @@ namespace UnityVisualStudioSolutionGenerator
         /// <inheritdoc />
         public override int GetHashCode()
         {
+            if (Id.Length == 0)
+            {
+                return ProjectName.GetHashCode(StringComparison.Ordinal);
+            }
+
             return Id.GetHashCode(StringComparison.Ordinal);
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
+            if (Id.Length == 0)
+            {
+                return $"{nameof(FilePath)}: {FilePath}";
+            }
+
             return $"{nameof(FilePath)}: {FilePath}, {nameof(Id)}: {Id}";
         }
 
         private bool Equals(ProjectFile other)
         {
+            if (Id.Length + other.Id.Length == 0)
+            {
+                // if using slnx the Id is empty.
+                return ProjectName == other.ProjectName;
+            }
+
             // we need to use the ProjectName as an alternative so we detect duplicate entries inside .sln
             return Id == other.Id || ProjectName == other.ProjectName;
         }
