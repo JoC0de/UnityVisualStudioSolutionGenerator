@@ -29,10 +29,11 @@ namespace UnityVisualStudioSolutionGenerator
         internal static string WriteToText(SolutionFile solutionFile, IReadOnlyList<ProjectFile> newProjects)
         {
             using var stringWriter = new StringWriter();
-            WriteTo(solutionFile.IsXmlSolution, solutionFile.SolutionDirectoryPath, newProjects, stringWriter);
+            var useXmlFormat = solutionFile.IsXmlSolution;
+            WriteTo(useXmlFormat, solutionFile.SolutionDirectoryPath, newProjects, stringWriter);
 
             var result = stringWriter.ToString();
-            if (!result.EndsWith(WindowsNewLine, StringComparison.Ordinal))
+            if (useXmlFormat && !result.EndsWith(WindowsNewLine, StringComparison.Ordinal))
             {
                 result += WindowsNewLine;
             }
